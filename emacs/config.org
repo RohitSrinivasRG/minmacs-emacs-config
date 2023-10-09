@@ -8,7 +8,6 @@
   - [[#elpaca-package-manager][Elpaca Package Manager]]
   - [[#load-evil-mode][Load Evil Mode]]
   - [[#backup][Backup]]
-  - [[#reload-emacs][Reload Emacs]]
   - [[#general-keybindings][General Keybindings]]
   - [[#zooming-in-and-out][Zooming in and out]]
 - [[#consult][CONSULT]]
@@ -29,7 +28,7 @@
   - [[#global-configuration][Global Configuration]]
   - [[#dired-configuration][Dired Configuration]]
   - [[#ibuffer-configuration][Ibuffer Configuration]]
-  - [[#completion-buffer-configureation][Completion buffer Configureation]]
+  - [[#completion-buffer-configuration][Completion buffer Configuration]]
   - [[#treemacs-configuration][Treemacs Configuration]]
 - [[#orderless][ORDERLESS]]
 - [[#org-mode][ORG MODE]]
@@ -38,6 +37,7 @@
   - [[#org-level-headers][Org Level Headers]]
   - [[#source-code-block-tag-expansion][Source Code Block Tag Expansion]]
   - [[#disable-electric-indent][Disable Electric Indent]]
+- [[#projectile][PROJECTILE]]
 - [[#rainbow-delimiters][RAINBOW DELIMITERS]]
 - [[#rainbow-mode][RAINBOW MODE]]
 - [[#restart-emacs][RESTART-EMACS]]
@@ -46,9 +46,9 @@
   - [[#vterm][Vterm]]
   - [[#vterm-toggle][Vterm-Toggle]]
   - [[#multi-vterm][Multi-Vterm]]
+- [[#smartparens][SMARTPARENS]]
 - [[#sudo-edit][SUDO EDIT]]
 - [[#themes][THEMES]]
-- [[#tramp][TRAMP]]
 - [[#treemacs][TREEMACS]]
 - [[#vertico][VERTICO]]
 - [[#windowworkspace-management][WINDOW/WORKSPACE MANAGEMENT]]
@@ -145,17 +145,8 @@
 
 ** Backup
 By default, Emacs creates automatic backups of files in their original directories, such “file.el” and the backup “file.el~”.  This leads to a lot of clutter, so let’s tell Emacs to put all backups that it creates in the TRASH directory.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp 
 (setq backup-directory-alist '((".*" . "~/.local/share/Trash/files")))
-
-#+end_src
-
-** Reload Emacs
-#+begin_src emacs-lisp
-(defun reload-init-file ()
-  (interactive)
-  (load-file user-init-file)
-  (load-file user-init-file))
 
 #+end_src
 
@@ -169,7 +160,7 @@ By default, Emacs creates automatic backups of files in their original directori
     :states '(normal insert visual emacs)
     :keymaps 'override
     :prefix "SPC" ;; set leader
-    :global-prefix "M-SPC") ;; access leader in insert mode
+    :global-prefix "C-SPC") ;; access leader in insert mode
 
   (rgrs/leader-keys
     "b" '(:ignore t :wk "buffer")
@@ -200,7 +191,6 @@ By default, Emacs creates automatic backups of files in their original directori
   "h r r" '((lambda () (interactive) 
 	      (load-file "~/.config/emacs/init.el")
 	      (ignore (elpaca-process-queues))) :wk "Reload emacs config")
-  ;; "h r r" '(reload-init-file :wk "Reload emacs config")
   )
 
 (rgrs/leader-keys
@@ -253,6 +243,9 @@ By default, Emacs creates automatic backups of files in their original directori
   "g g" '(magit-status :wk "Magit-Status")
   "g C" '(magit-clone :wk "Magit clone"))
 
+(general-define-key 
+:keymaps 'minibuffer-local-map (kbd "C-v") 'yank)
+
 )
 
 #+end_src
@@ -272,7 +265,7 @@ By default, Emacs creates automatic backups of files in their original directori
 #+end_src
 
 * CORFU
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package corfu
 :init
 (global-corfu-mode)
@@ -321,7 +314,7 @@ By default, Emacs creates automatic backups of files in their original directori
 #+end_src
 
 * DIMINISH
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package diminish)
 #+end_src
 
@@ -343,7 +336,7 @@ By default, Emacs creates automatic backups of files in their original directori
 
 * FONTS
 ** Setting the Font Face
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp 
   (set-face-attribute 'default nil
   :font "JetBrains Mono"
   :height 120
@@ -388,7 +381,7 @@ By default, Emacs creates automatic backups of files in their original directori
 #+end_src
 
 * HIGHLIGHT INDENT GUIDES
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package highlight-indent-guides
 :ensure t
 :config
@@ -417,6 +410,7 @@ By default, Emacs creates automatic backups of files in their original directori
   ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
   )
 #+end_src
+
 ** Dired Configuration
 #+begin_src emacs-lisp
 (use-package nerd-icons-dired
@@ -431,7 +425,7 @@ By default, Emacs creates automatic backups of files in their original directori
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 #+end_src
 
-** Completion buffer Configureation
+** Completion buffer Configuration
 #+begin_src  emacs-lisp
 (use-package nerd-icons-completion
   :after marginalia
@@ -441,18 +435,22 @@ By default, Emacs creates automatic backups of files in their original directori
 #+end_src
 
 ** Treemacs Configuration
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package treemacs-nerd-icons
   :config
   (treemacs-load-theme "nerd-icons"))
 #+end_src
-* ORDERLESS
-#+begin_src emacs-lisp 
-(use-package orderless
-:ensure t
-:config
-(setq completion-styles '(orderless basics)))
 
+* ORDERLESS
+#+begin_src emacs-lisp
+(use-package orderless
+  :init
+  ;; Configure a custom style dispatcher (see the Consult wiki)
+  ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
+  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
 #+end_src
 * ORG MODE
 ** Enabling Table of Contents
@@ -463,14 +461,14 @@ By default, Emacs creates automatic backups of files in their original directori
 #+end_src
 
 ** Enabling Org Bullets
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp 
   (add-hook 'org-mode-hook 'org-indent-mode)
   (use-package org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 #+end_src
 
 ** Org Level Headers
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp 
   (custom-set-faces
   '(org-level-1 ((t (:inherit outline-1 :height 1.7))))
   '(org-level-2 ((t (:inherit outline-2 :height 1.6))))
@@ -497,14 +495,22 @@ Current Expansions include [[https://orgmode.org/manual/Structure-Templates.html
 | <s                     | '#+BEGIN_SRC' … '#+END_SRC'             |
 | <v                     | '#+BEGIN_VERSE' … '#+END_VERSE'         |
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp 
 (require 'org-tempo)
 #+end_src
 
 ** Disable Electric Indent
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp 
 (electric-indent-mode -1)
 (setq org-edit-src-content-indentation 0)
+#+end_src
+
+* PROJECTILE
+#+begin_src emacs-lisp
+(use-package projectile
+:config
+(projectile-mode))
+
 #+end_src
 
 * RAINBOW DELIMITERS
@@ -549,13 +555,15 @@ Emacs Shell
 #+begin_src emacs-lisp
 (use-package vterm
 :config
-(setq shell-file-name "/usr/bin/bash"))
-;; (setq vterm-tramp-shells (list '("ssh" "/usr/bin/bash"))))
+(setq shell-file-name "/usr/bin/bash")
+(add-to-list 'vterm-tramp-shells '("ssh" "/bin/bash"))
+(add-to-list 'vterm-tramp-shells '("sudo" "/bin/bash"))
+)
 
 #+end_src
 
 ** Vterm-Toggle
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp 
 (use-package vterm-toggle
   :after vterm
   :config
@@ -583,6 +591,17 @@ Emacs Shell
 :ensure t)
 #+end_src
 
+* SMARTPARENS
+#+begin_src emacs-lisp
+(use-package smartparens
+:config
+(smartparens-global-mode))
+
+(use-package evil-smartparens
+:config
+(add-hook 'smartparens-enabled-hook #'evil-smartparens-mode))
+
+#+end_src
 * SUDO EDIT
 #+begin_src emacs-lisp
 (use-package sudo-edit
@@ -603,17 +622,13 @@ Emacs Shell
       doom-themes-enable-italic t))
 
 (setq custom-safe-themes t)
-(load-theme 'doom-nord)
+(add-hook 'elpaca-after-init-hook (lambda() (load-theme 'doom-nord)))
+;; (load-theme 'doom-nord)
 
 #+end_src
 
-* TRAMP
-#+begin_src emacs-lisp
-;; (setq tramp-default-remote-shell "/usr/bin/bash")
-
-#+end_src
 * TREEMACS
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package treemacs
   :ensure t
   :defer t
@@ -726,22 +741,23 @@ Emacs Shell
   :config (treemacs-set-scope-type 'Tabs))
 
 #+end_src
+
 * VERTICO
 Minibuffer from the future
 #+begin_src emacs-lisp
 (use-package vertico
   :init
   (vertico-mode)
-(use-package savehist
-  :init
-  (savehist-mode))
+;; (use-package savehist
+;;   :init
+;;   (savehist-mode))
 )
 (setq enable-recursive-minibuffers t)
 #+end_src
 
 * WINDOW/WORKSPACE MANAGEMENT
 ** Window Numbering
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp 
 (use-package winum
 :config
 (winum-mode))
