@@ -13,6 +13,7 @@
 - [[#consult][CONSULT]]
 - [[#corfu][CORFU]]
 - [[#dashboard][DASHBOARD]]
+- [[#dired][DIRED]]
 - [[#diminish][DIMINISH]]
 - [[#doom-modeline][DOOM MODELINE]]
 - [[#fonts][FONTS]]
@@ -311,6 +312,22 @@ By default, Emacs creates automatic backups of files in their original directori
 (setq dashboard-icon-type 'nerd-icons)
 (setq dashboard-set-heading-icons t)
 (setq dashboard-set-file-icons t)
+#+end_src
+* DIRED
+#+begin_src emacs-lisp :tangle no
+(use-package dired-open
+  :config
+  (setq dired-open-extensions '(("vcd" . "gtkwave")
+				  ("fst" . "gtkwave"))))
+(use-package peep-dired
+  :after dired
+  :hook (evil-normalize-keymaps . peep-dired-hook)
+  :config
+    (evil-define-key 'normal dired-mode-map (kbd "h") 'dired-up-directory)
+    (evil-define-key 'normal dired-mode-map (kbd "l") 'dired-open-file) ; use dired-find-file instead if not using dired-open package
+    (evil-define-key 'normal peep-dired-mode-map (kbd "j") 'peep-dired-next-file)
+    (evil-define-key 'normal peep-dired-mode-map (kbd "k") 'peep-dired-prev-file)
+)
 #+end_src
 
 * DIMINISH

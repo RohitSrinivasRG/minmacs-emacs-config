@@ -117,7 +117,6 @@
   "h r r" '((lambda () (interactive) 
 	      (load-file "~/.config/emacs/init.el")
 	      (ignore (elpaca-process-queues))) :wk "Reload emacs config")
-  ;; "h r r" '(reload-init-file :wk "Reload emacs config")
   )
 
 (rgrs/leader-keys
