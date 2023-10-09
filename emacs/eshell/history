@@ -1,0 +1,45 @@
+ls
+ll
+ff
+exit
+ls
+ll
+ls
+ls
+ll
+ls
+ff
+ff config.el 
+eshell-read-aliases-list 
+alias ll 'ls -l $*'
+ll
+eshell-read-aliases-list 
+ff config.el 
+ff config.el 
+eshell-read-aliases-list 
+ff config.el 
+eshell-read-aliases-list 
+ls
+ls
+exa
+which bsc
+ls
+eshell-read-aliases-list 
+eshell-read-aliases-list 
+verilator
+clear
+clear
+ls
+clear_s
+ls
+which bsc
+env_verif
+source 
+source ~/tools/virtualenvs/verif/bin/activate
+ls
+ls
+clear
+ls
+clear
+ls
+exit
