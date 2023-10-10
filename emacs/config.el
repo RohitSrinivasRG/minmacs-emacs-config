@@ -90,10 +90,10 @@
 
   (rgrs/leader-keys
     "b" '(:ignore t :wk "buffer")
-    "b b" '(consult-buffer :wk "Switch buffer")
-    "b i" '(ibuffer :wk "Ibuffer")
+    "b b" '(persp-switch-to-buffer* :wk "Switch buffer")
+    "b i" '(persp-ibuffer :wk "Ibuffer")
     "b R" '(rename-buffer :wk "rename the current buffer")
-    "b k" '(kill-this-buffer :wk "Kill this buffer")
+    "b k" '(persp-kill-buffer :wk "Kill this buffer")
     "b n" '(next-buffer :wk "Next buffer")
     "b p" '(previous-buffer :wk "Previous buffer")
     "b r" '(revert-buffer :wk "Reload buffer"))
@@ -173,6 +173,18 @@
 
 (general-define-key 
 :keymaps 'minibuffer-local-map (kbd "C-v") 'yank)
+
+(rgrs/leader-keys
+  "TAB" '(:ignore t :wk "Perspective")
+  "TAB s" '(persp-switch :wk "Create or Switch perspectives")
+  "TAB r" '(persp-rename :wk "Rename perspectives")
+  "TAB c c" '(persp-kill :wk "Kill the perspective")
+  "TAB n" '(persp-next :wk "Switch to next perspective")
+  "TAB p" '(persp-prev :wk "Switch to prev perspective")
+  "TAB m" '(persp-merge :wk "Temporarily merge two perspectives")
+  "TAB u" '(persp-unmerge :wk "Undo persp-merge")
+  "TAB a" '(persp-add-buffer :wk "Add open buffer to current perspective")
+  "TAB A" '(persp-set-buffer :wk "Add buffer to current but delete from all others"))
 
 
 
@@ -373,6 +385,12 @@
 (use-package projectile
 :config
 (projectile-mode))
+
+(use-package perspective
+  :custom
+  (persp-mode-prefix-key (kbd "C-c M-p"))  ; pick your own prefix key here
+  :init
+  (persp-mode))
 
 (use-package rainbow-delimiters
 :config
