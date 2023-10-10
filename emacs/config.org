@@ -10,6 +10,7 @@
   - [[#backup][Backup]]
   - [[#general-keybindings][General Keybindings]]
   - [[#zooming-in-and-out][Zooming in and out]]
+- [[#anzu][ANZU]]
 - [[#consult][CONSULT]]
 - [[#corfu][CORFU]]
 - [[#dashboard][DASHBOARD]]
@@ -25,6 +26,7 @@
   - [[#disable-menubar-toolbars-and-scrollbars][Disable menubar, toolbars and Scrollbars]]
 - [[#highlight-indent-guides][HIGHLIGHT INDENT GUIDES]]
 - [[#marginalia][MARGINALIA]]
+- [[#multiple-cursors-evil][MULTIPLE-CURSORS-EVIL]]
 - [[#nerd-icons][NERD-ICONS]]
   - [[#global-configuration][Global Configuration]]
   - [[#dired-configuration][Dired Configuration]]
@@ -39,6 +41,7 @@
   - [[#source-code-block-tag-expansion][Source Code Block Tag Expansion]]
   - [[#disable-electric-indent][Disable Electric Indent]]
 - [[#projectile][PROJECTILE]]
+- [[#perspective][PERSPECTIVE]]
 - [[#rainbow-delimiters][RAINBOW DELIMITERS]]
 - [[#rainbow-mode][RAINBOW MODE]]
 - [[#restart-emacs][RESTART-EMACS]]
@@ -54,6 +57,7 @@
 - [[#vertico][VERTICO]]
 - [[#windowworkspace-management][WINDOW/WORKSPACE MANAGEMENT]]
   - [[#window-numbering][Window Numbering]]
+  - [[#winner-mode][Winner mode]]
 - [[#which-key][WHICH-KEY]]
 
 * IMPORTANT FILES TO LOAD FIRST
@@ -207,6 +211,8 @@ By default, Emacs creates automatic backups of files in their original directori
   "w n" '(evil-window-new :wk "New window")
   "w s" '(evil-window-split :wk "Horizontal split window")
   "w v" '(evil-window-vsplit :wk "Vertical split window")
+  "w u" '(winner-undo :wk "Undo Window configuration")
+  "w r" '(winner-redo :wk "Redo Window configuration")
   ;; Window motions
   "w h" '(evil-window-left :wk "Window left")
   "w j" '(evil-window-down :wk "Window down")
@@ -247,6 +253,10 @@ By default, Emacs creates automatic backups of files in their original directori
 (general-define-key 
 :keymaps 'minibuffer-local-map (kbd "C-v") 'yank)
 
+
+
+
+
 )
 
 #+end_src
@@ -259,6 +269,14 @@ By default, Emacs creates automatic backups of files in their original directori
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 #+end_src
 
+* ANZU
+#+begin_src emacs-lisp
+(use-package anzu
+:config
+(global-anzu-mode 1)
+(general-define-key [remap query-replace] 'anzu-query-replace)
+(general-define-key [remap query-replace-regexp] 'anzu-query-replace-regexp))
+#+end_src
 * CONSULT
 #+begin_src emacs-lisp
 (use-package consult)
@@ -314,19 +332,19 @@ By default, Emacs creates automatic backups of files in their original directori
 (setq dashboard-set-file-icons t)
 #+end_src
 * DIRED
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
 (use-package dired-open
   :config
   (setq dired-open-extensions '(("vcd" . "gtkwave")
 				  ("fst" . "gtkwave"))))
 (use-package peep-dired
   :after dired
-  :hook (evil-normalize-keymaps . peep-dired-hook)
   :config
-    (evil-define-key 'normal dired-mode-map (kbd "h") 'dired-up-directory)
-    (evil-define-key 'normal dired-mode-map (kbd "l") 'dired-open-file) ; use dired-find-file instead if not using dired-open package
-    (evil-define-key 'normal peep-dired-mode-map (kbd "j") 'peep-dired-next-file)
-    (evil-define-key 'normal peep-dired-mode-map (kbd "k") 'peep-dired-prev-file)
+    (general-evil-define-key 'normal dired-mode-map (kbd "h") 'dired-up-directory)
+    (general-evil-define-key 'normal dired-mode-map (kbd "l") 'dired-open-file) ; use dired-find-file instead if not using dired-open package
+    (general-evil-define-key 'normal peep-dired-mode-map (kbd "j") 'peep-dired-next-file)
+    (general-evil-define-key 'normal peep-dired-mode-map (kbd "k") 'peep-dired-prev-file)
+    (add-hook 'peep-dired-hook 'evil-normalize-keymaps)
 )
 #+end_src
 
@@ -415,7 +433,28 @@ By default, Emacs creates automatic backups of files in their original directori
 (marginalia-mode))
 
 #+end_src
-
+* MULTIPLE-CURSORS-EVIL
+#+begin_src emacs-lisp
+(use-package evil-multiedit
+:config
+(evil-multiedit-default-keybinds)
+;; (general-define-key :keymap `evil-visual-state-map "R" 'evil-multiedit-match-all)
+(general-define-key :keymap `evil-normal-state-map (kbd "M-d") 'evil-multiedit-match-and-next)
+(general-define-key :keymap `evil-visual-state-map (kbd "M-d") 'evil-multiedit-match-and-next)
+(general-define-key :keymap `evil-insert-state-map (kbd "M-d") 'evil-multiedit-toggle-marker-here)
+(general-define-key :keymap `evil-normal-state-map (kbd "M-D") 'evil-multiedit-match-and-prev)
+(general-define-key :keymap `evil-visual-state-map (kbd "M-D") 'evil-multiedit-match-and-prev)
+(general-define-key :keymap `evil-visual-state-map (kbd "C-M-D") 'evil-multiedit-restore)'
+(general-define-key :keymap 'evil-multiedit-state-map (kbd "RET") 'evil-multiedit-toggle-or-restrict-region)
+(general-define-key :keymap 'evil-motion-state-map (kbd "RET") 'evil-multiedit-toggle-or-restrict-region)
+(general-define-key :keymap 'evil-multiedit-state-map (kbd "C-n") 'evil-multiedit-next)
+(general-define-key :keymap 'evil-multiedit-state-map (kbd "C-p") 'evil-multiedit-prev)
+(general-define-key :keymap 'evil-multiedit-insert-state-map (kbd "C-n") 'evil-multiedit-next)
+(general-define-key :keymap 'evil-multiedit-insert-state-map (kbd "C-p") 'evil-multiedit-prev)
+(evil-ex-define-cmd "ie[dit]" 'evil-multiedit-ex-match)
+)
+;; TODO need to add evil-mc to play hand in hand with evil-multiedit
+#+end_src
 * NERD-ICONS
 ** Global Configuration
 #+begin_src emacs-lisp
@@ -529,7 +568,15 @@ Current Expansions include [[https://orgmode.org/manual/Structure-Templates.html
 (projectile-mode))
 
 #+end_src
+* PERSPECTIVE 
+#+begin_src emacs-lisp :tangle no
+(use-package perspective
+  :custom
+  (persp-mode-prefix-key (kbd "C-c M-p"))  ; pick your own prefix key here
+  :init
+  (persp-mode))
 
+#+end_src
 * RAINBOW DELIMITERS
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
@@ -790,6 +837,11 @@ Minibuffer from the future
 (global-set-key (kbd "M-8") 'winum-select-window-8)
 #+end_src
 
+** Winner mode
+#+begin_src emacs-lisp
+(winner-mode 1)
+
+#+end_src
 * WHICH-KEY
 #+begin_src emacs-lisp
   (use-package which-key

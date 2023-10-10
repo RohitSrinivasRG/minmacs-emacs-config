@@ -132,6 +132,8 @@
   "w n" '(evil-window-new :wk "New window")
   "w s" '(evil-window-split :wk "Horizontal split window")
   "w v" '(evil-window-vsplit :wk "Vertical split window")
+  "w u" '(winner-undo :wk "Undo Window configuration")
+  "w r" '(winner-redo :wk "Redo Window configuration")
   ;; Window motions
   "w h" '(evil-window-left :wk "Window left")
   "w j" '(evil-window-down :wk "Window down")
@@ -172,12 +174,22 @@
 (general-define-key 
 :keymaps 'minibuffer-local-map (kbd "C-v") 'yank)
 
+
+
+
+
 )
 
 (global-set-key (kbd "C-=") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+
+(use-package anzu
+:config
+(global-anzu-mode 1)
+(general-define-key [remap query-replace] 'anzu-query-replace)
+(general-define-key [remap query-replace-regexp] 'anzu-query-replace-regexp))
 
 (use-package consult)
 
@@ -217,6 +229,20 @@
 (setq dashboard-icon-type 'nerd-icons)
 (setq dashboard-set-heading-icons t)
 (setq dashboard-set-file-icons t)
+
+(use-package dired-open
+  :config
+  (setq dired-open-extensions '(("vcd" . "gtkwave")
+				  ("fst" . "gtkwave"))))
+(use-package peep-dired
+  :after dired
+  :config
+    (general-evil-define-key 'normal dired-mode-map (kbd "h") 'dired-up-directory)
+    (general-evil-define-key 'normal dired-mode-map (kbd "l") 'dired-open-file) ; use dired-find-file instead if not using dired-open package
+    (general-evil-define-key 'normal peep-dired-mode-map (kbd "j") 'peep-dired-next-file)
+    (general-evil-define-key 'normal peep-dired-mode-map (kbd "k") 'peep-dired-prev-file)
+    (add-hook 'peep-dired-hook 'evil-normalize-keymaps)
+)
 
 (use-package doom-modeline
   :ensure t
@@ -270,6 +296,26 @@
 ("M-A" . marginalia-cycle))
 :init
 (marginalia-mode))
+
+(use-package evil-multiedit
+:config
+(evil-multiedit-default-keybinds)
+;; (general-define-key :keymap `evil-visual-state-map "R" 'evil-multiedit-match-all)
+(general-define-key :keymap `evil-normal-state-map (kbd "M-d") 'evil-multiedit-match-and-next)
+(general-define-key :keymap `evil-visual-state-map (kbd "M-d") 'evil-multiedit-match-and-next)
+(general-define-key :keymap `evil-insert-state-map (kbd "M-d") 'evil-multiedit-toggle-marker-here)
+(general-define-key :keymap `evil-normal-state-map (kbd "M-D") 'evil-multiedit-match-and-prev)
+(general-define-key :keymap `evil-visual-state-map (kbd "M-D") 'evil-multiedit-match-and-prev)
+(general-define-key :keymap `evil-visual-state-map (kbd "C-M-D") 'evil-multiedit-restore)'
+(general-define-key :keymap 'evil-multiedit-state-map (kbd "RET") 'evil-multiedit-toggle-or-restrict-region)
+(general-define-key :keymap 'evil-motion-state-map (kbd "RET") 'evil-multiedit-toggle-or-restrict-region)
+(general-define-key :keymap 'evil-multiedit-state-map (kbd "C-n") 'evil-multiedit-next)
+(general-define-key :keymap 'evil-multiedit-state-map (kbd "C-p") 'evil-multiedit-prev)
+(general-define-key :keymap 'evil-multiedit-insert-state-map (kbd "C-n") 'evil-multiedit-next)
+(general-define-key :keymap 'evil-multiedit-insert-state-map (kbd "C-p") 'evil-multiedit-prev)
+(evil-ex-define-cmd "ie[dit]" 'evil-multiedit-ex-match)
+)
+;; TODO need to add evil-mc to play hand in hand with evil-multiedit
 
 (use-package nerd-icons
   ;; :custom
@@ -415,6 +461,8 @@
 (global-set-key (kbd "M-6") 'winum-select-window-6)
 (global-set-key (kbd "M-7") 'winum-select-window-7)
 (global-set-key (kbd "M-8") 'winum-select-window-8)
+
+(winner-mode 1)
 
 (use-package which-key
   :init
