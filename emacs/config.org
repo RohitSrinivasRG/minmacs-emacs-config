@@ -12,7 +12,6 @@
   - [[#zooming-in-and-out][Zooming in and out]]
 - [[#anzu][ANZU]]
 - [[#consult][CONSULT]]
-- [[#corfu][CORFU]]
 - [[#dashboard][DASHBOARD]]
 - [[#dired][DIRED]]
 - [[#diminish][DIMINISH]]
@@ -172,7 +171,7 @@ By default, Emacs creates automatic backups of files in their original directori
     "b b" '(persp-switch-to-buffer* :wk "Switch buffer")
     "b i" '(persp-ibuffer :wk "Ibuffer")
     "b R" '(rename-buffer :wk "rename the current buffer")
-    "b k" '(persp-kill-buffer :wk "Kill this buffer")
+    "b k" '(persp-kill-buffer* :wk "Kill this buffer")
     "b n" '(next-buffer :wk "Next buffer")
     "b p" '(previous-buffer :wk "Previous buffer")
     "b r" '(revert-buffer :wk "Reload buffer"))
@@ -248,7 +247,8 @@ By default, Emacs creates automatic backups of files in their original directori
 (rgrs/leader-keys
   "g" '(:ignore t :wk "Git")
   "g g" '(magit-status :wk "Magit-Status")
-  "g C" '(magit-clone :wk "Magit clone"))
+  "g C" '(magit-clone :wk "Magit clone")
+  "g i" '(magit-init :wk "Magit init repo"))
 
 (general-define-key 
 :keymaps 'minibuffer-local-map (kbd "C-v") 'yank)
@@ -263,7 +263,8 @@ By default, Emacs creates automatic backups of files in their original directori
   "TAB m" '(persp-merge :wk "Temporarily merge two perspectives")
   "TAB u" '(persp-unmerge :wk "Undo persp-merge")
   "TAB a" '(persp-add-buffer :wk "Add open buffer to current perspective")
-  "TAB A" '(persp-set-buffer :wk "Add buffer to current but delete from all others"))
+  "TAB A" '(persp-set-buffer :wk "Add buffer to current but delete from all others")
+  "TAB TAB" '(persp-switch-by-number :wk "switch to perspective by number"))
 
 
 
@@ -294,16 +295,6 @@ By default, Emacs creates automatic backups of files in their original directori
 (use-package consult)
 
 #+end_src
-
-* CORFU
-#+begin_src emacs-lisp :tangle no
-(use-package corfu
-:init
-(global-corfu-mode)
-:custom
-(corfu-auto t))
-
-#+end_src
 * DASHBOARD
 #+begin_src emacs-lisp
 (use-package dashboard
@@ -318,7 +309,7 @@ By default, Emacs creates automatic backups of files in their original directori
 ;; Set the title
 (setq dashboard-banner-logo-title "Life is all about MinMacs")
 ;; Set the banner
-(setq dashboard-startup-banner "/home/rohit/.config/emacs/images/ascii-text-art.txt")
+(setq dashboard-startup-banner "/home/rohit/.config/emacs/images/Final_Splash_screen.txt")
 ;; Value can be
 ;; - nil to display no banner
 ;; - 'official which displays the official emacs logo
