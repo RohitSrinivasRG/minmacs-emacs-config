@@ -12,18 +12,21 @@
   - [[#zooming-in-and-out][Zooming in and out]]
 - [[#anzu][ANZU]]
 - [[#consult][CONSULT]]
+- [[#company][COMPANY]]
 - [[#dashboard][DASHBOARD]]
 - [[#dired][DIRED]]
 - [[#diminish][DIMINISH]]
 - [[#doom-modeline][DOOM MODELINE]]
 - [[#fonts][FONTS]]
   - [[#setting-the-font-face][Setting the Font Face]]
+- [[#flycheck][FLYCHECK]]
 - [[#git-program][GIT PROGRAM]]
   - [[#git-time-machine][Git Time Machine]]
   - [[#magit][Magit]]
 - [[#graphical-user-interface-tweaks][GRAPHICAL USER INTERFACE TWEAKS]]
   - [[#disable-menubar-toolbars-and-scrollbars][Disable menubar, toolbars and Scrollbars]]
 - [[#highlight-indent-guides][HIGHLIGHT INDENT GUIDES]]
+- [[#language-support][LANGUAGE SUPPORT]]
 - [[#marginalia][MARGINALIA]]
 - [[#multiple-cursors-evil][MULTIPLE-CURSORS-EVIL]]
 - [[#nerd-icons][NERD-ICONS]]
@@ -295,6 +298,15 @@ By default, Emacs creates automatic backups of files in their original directori
 (use-package consult)
 
 #+end_src
+
+* COMPANY
+#+begin_src emacs-lisp
+(use-package company
+:config
+(setq company-idle-delay (lambda () (if (company-in-string-or-comment) nil 0.2))))
+
+(add-hook 'elpaca-after-init-hook 'global-company-mode)
+#+end_src
 * DASHBOARD
 #+begin_src emacs-lisp
 (use-package dashboard
@@ -404,6 +416,12 @@ By default, Emacs creates automatic backups of files in their original directori
 (setq-default line-spacing 0.12)
 #+end_src
 
+* FLYCHECK
+#+begin_src emacs-lisp
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+#+end_src
 * GIT PROGRAM
 ** Git Time Machine
 ** Magit
@@ -427,6 +445,10 @@ By default, Emacs creates automatic backups of files in their original directori
 (setq highlight-indent-guides-method 'character))
 #+end_src
 
+* LANGUAGE SUPPORT
+#+begin_src emacs-lisp
+(add-to-list `load-path (org-babel-load-file (expand-file-name "~/.config/emacs/scripts/custom_language.org" "~/.config/emacs/scripts/")))
+#+end_src
 * MARGINALIA
 #+begin_src emacs-lisp
 (use-package marginalia

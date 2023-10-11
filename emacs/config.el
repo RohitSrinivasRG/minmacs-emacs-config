@@ -207,6 +207,12 @@
 
 (use-package consult)
 
+(use-package company
+:config
+(setq company-idle-delay (lambda () (if (company-in-string-or-comment) nil 0.2))))
+
+(add-hook 'elpaca-after-init-hook 'global-company-mode)
+
 (use-package dashboard
   :elpaca t
   :config
@@ -299,11 +305,17 @@
 ;; Uncomment the following line if line spacing needs adjusting.
 (setq-default line-spacing 0.12)
 
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
 (use-package magit)
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+
+(add-to-list `load-path (org-babel-load-file (expand-file-name "~/.config/emacs/scripts/custom_language.org" "~/.config/emacs/scripts/")))
 
 (use-package marginalia
 :bind (:map minibuffer-local-map

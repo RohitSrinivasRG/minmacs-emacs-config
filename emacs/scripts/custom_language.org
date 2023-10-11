@@ -1,0 +1,23 @@
+#+TITLE: LANGUAGE SUPPORT FOR MINMACS
+#+AUTHOR: Rohit Srinivas R G
+
+* BLUESPEC SYSTEM VERILOG (BSV)
+#+begin_src emacs-lisp
+(add-to-list 'load-path "~/.config/emacs/languages/bsv/")
+(add-to-list 'load-path "~/.config/emacs/languages/bsv/emacs20-extras.el")
+(add-to-list 'load-path "~/.config/emacs/languages/bsv/mark.el")
+
+(autoload 'bsv-mode "bsv-mode" "BSV mode" t )
+(setq auto-mode-alist (cons  '("\\.bsv\\'" . bsv-mode) auto-mode-alist))
+(setq auto-mode-alist (cons  '("\\.defines\\'" . bsv-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("\\.defs\\'" . bsv-mode) auto-mode-alist))
+(setq bsv-indent-level-behavioral 2)
+(setq bsv-indent-level-declaration 2)
+(setq bsv-indent-level 2)
+#+end_src
+
+* SYNOPSYS DESIGN CONSTRAINT (SDC)
+#+begin_src emacs-lisp
+(setq auto-mode-alist (cons '("\\.sdc\\'" . tcl-mode) auto-mode-alist))
+
+#+end_src
