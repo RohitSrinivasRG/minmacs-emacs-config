@@ -76,6 +76,10 @@
 ;; Setting RETURN key in org-mode to follow links
   (setq org-return-follows-link  t)
 
+(use-package evil-visualstar
+:init
+(global-evil-visualstar-mode))
+
 (setq backup-directory-alist '((".*" . "~/.local/share/Trash/files")))
 
 (use-package general
@@ -96,7 +100,7 @@
     "b k" '(persp-kill-buffer* :wk "Kill this buffer")
     "b n" '(next-buffer :wk "Next buffer")
     "b p" '(previous-buffer :wk "Previous buffer")
-    "b r" '(revert-buffer :wk "Reload buffer"))
+    "b r" '(revert-buffer-quick :wk "Reload buffer"))
 
   (rgrs/leader-keys
    "e" '(:ignore t :wk "Evaluate")    
@@ -108,12 +112,14 @@
 
 (rgrs/leader-keys
   "." '(find-file :wk "Find file")
-  "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config"))
+  "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+  "f y" '(put-file-name-on-clipboard :wk "Copy current working directory onto the clipboard"))
 
 (rgrs/leader-keys
   "h" '(:ignore t :wk "Help")
   "h f" '(describe-function :wk "Describe function")
   "h v" '(describe-variable :wk "Describe variable")
+  "h k" '(describe-key :wk "Describe keybindings")
   "h r r" '((lambda () (interactive) 
 	      (load-file "~/.config/emacs/init.el")
 	      (ignore (elpaca-process-queues))) :wk "Reload emacs config")
@@ -122,6 +128,7 @@
 (rgrs/leader-keys
   "t" '(:ignore t :wk "Toggle")
   "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+  "t r" '(rgrs/toggle-line-numbering :wk "Toggle between absolute and relative line numbers")
   "t w" '(visual-line-mode :wk "word wrap"))
 
 (rgrs/leader-keys
@@ -213,6 +220,18 @@
 
 (add-hook 'elpaca-after-init-hook 'global-company-mode)
 
+(defun put-file-name-on-clipboard ()
+  "Put the current file name on the clipboard"
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (with-temp-buffer
+        (insert filename)
+        (clipboard-kill-region (point-min) (point-max)))
+      (message filename))))
+
 (use-package dashboard
   :elpaca t
   :config
@@ -277,6 +296,12 @@
 (setq doom-modeline-buffer-state-icon t)
 (setq doom-modeline-enable-word-count nil)
 
+(use-package drag-stuff
+:init
+(drag-stuff-global-mode)
+:config
+(drag-stuff-define-keys))
+
 (set-face-attribute 'default nil
   :font "JetBrains Mono"
   :height 120
@@ -314,6 +339,19 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+
+(use-package hl-todo
+  :hook ((org-mode . hl-todo-mode)
+         (prog-mode . hl-todo-mode))
+  :config
+  (setq hl-todo-highlight-punctuation ":"
+        hl-todo-keyword-faces
+        `(("TODO"       warning bold)
+          ("FIXME"      error bold)
+          ("HACK"       font-lock-constant-face bold)
+          ("REVIEW"     font-lock-keyword-face bold)
+          ("NOTE"       success bold)
+          ("DEPRECATED" font-lock-doc-face bold))))
 
 (add-to-list `load-path (org-babel-load-file (expand-file-name "~/.config/emacs/scripts/custom_language.org" "~/.config/emacs/scripts/")))
 
@@ -470,6 +508,13 @@
 (setq custom-safe-themes t)
 (add-hook 'elpaca-after-init-hook (lambda() (load-theme 'doom-nord)))
 ;; (load-theme 'doom-nord)
+
+(defun rgrs/toggle-line-numbering ()
+  "Toggle line numbering between absolute and relative."
+  (interactive)
+  (if (eq display-line-numbers 'relative)
+      (setq display-line-numbers t)
+    (setq display-line-numbers 'relative)))
 
 (use-package vertico
   :init

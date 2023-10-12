@@ -10,4 +10,6 @@
 (setq bsv-indent-level-declaration 2)
 (setq bsv-indent-level 2)
 
+;;remainder theree is a bsv-indent-alist that defines the the indent variable to be used for each type of block
+
 (setq auto-mode-alist (cons '("\\.sdc\\'" . tcl-mode) auto-mode-alist))

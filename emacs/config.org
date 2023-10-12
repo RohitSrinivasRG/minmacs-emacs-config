@@ -13,10 +13,12 @@
 - [[#anzu][ANZU]]
 - [[#consult][CONSULT]]
 - [[#company][COMPANY]]
+- [[#copy-file-path-to-clipboard][COPY FILE PATH TO CLIPBOARD]]
 - [[#dashboard][DASHBOARD]]
 - [[#dired][DIRED]]
 - [[#diminish][DIMINISH]]
 - [[#doom-modeline][DOOM MODELINE]]
+- [[#drag-stuff][DRAG STUFF]]
 - [[#fonts][FONTS]]
   - [[#setting-the-font-face][Setting the Font Face]]
 - [[#flycheck][FLYCHECK]]
@@ -25,6 +27,7 @@
   - [[#magit][Magit]]
 - [[#graphical-user-interface-tweaks][GRAPHICAL USER INTERFACE TWEAKS]]
   - [[#disable-menubar-toolbars-and-scrollbars][Disable menubar, toolbars and Scrollbars]]
+- [[#highlight-todo][HIGHLIGHT TODO]]
 - [[#highlight-indent-guides][HIGHLIGHT INDENT GUIDES]]
 - [[#language-support][LANGUAGE SUPPORT]]
 - [[#marginalia][MARGINALIA]]
@@ -55,6 +58,7 @@
 - [[#smartparens][SMARTPARENS]]
 - [[#sudo-edit][SUDO EDIT]]
 - [[#themes][THEMES]]
+- [[#toggling-line-numbers][TOGGLING LINE-NUMBERS]]
 - [[#treemacs][TREEMACS]]
 - [[#vertico][VERTICO]]
 - [[#windowworkspace-management][WINDOW/WORKSPACE MANAGEMENT]]
@@ -148,6 +152,10 @@
 ;; Setting RETURN key in org-mode to follow links
   (setq org-return-follows-link  t)
 
+(use-package evil-visualstar
+:init
+(global-evil-visualstar-mode))
+
 #+end_src
 
 ** Backup
@@ -177,7 +185,7 @@ By default, Emacs creates automatic backups of files in their original directori
     "b k" '(persp-kill-buffer* :wk "Kill this buffer")
     "b n" '(next-buffer :wk "Next buffer")
     "b p" '(previous-buffer :wk "Previous buffer")
-    "b r" '(revert-buffer :wk "Reload buffer"))
+    "b r" '(revert-buffer-quick :wk "Reload buffer"))
 
   (rgrs/leader-keys
    "e" '(:ignore t :wk "Evaluate")    
@@ -189,12 +197,14 @@ By default, Emacs creates automatic backups of files in their original directori
 
 (rgrs/leader-keys
   "." '(find-file :wk "Find file")
-  "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config"))
+  "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+  "f y" '(put-file-name-on-clipboard :wk "Copy current working directory onto the clipboard"))
 
 (rgrs/leader-keys
   "h" '(:ignore t :wk "Help")
   "h f" '(describe-function :wk "Describe function")
   "h v" '(describe-variable :wk "Describe variable")
+  "h k" '(describe-key :wk "Describe keybindings")
   "h r r" '((lambda () (interactive) 
 	      (load-file "~/.config/emacs/init.el")
 	      (ignore (elpaca-process-queues))) :wk "Reload emacs config")
@@ -203,6 +213,7 @@ By default, Emacs creates automatic backups of files in their original directori
 (rgrs/leader-keys
   "t" '(:ignore t :wk "Toggle")
   "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+  "t r" '(rgrs/toggle-line-numbering :wk "Toggle between absolute and relative line numbers")
   "t w" '(visual-line-mode :wk "word wrap"))
 
 (rgrs/leader-keys
@@ -307,6 +318,21 @@ By default, Emacs creates automatic backups of files in their original directori
 
 (add-hook 'elpaca-after-init-hook 'global-company-mode)
 #+end_src
+* COPY FILE PATH TO CLIPBOARD
+#+begin_src emacs-lisp
+(defun put-file-name-on-clipboard ()
+  "Put the current file name on the clipboard"
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (with-temp-buffer
+        (insert filename)
+        (clipboard-kill-region (point-min) (point-max)))
+      (message filename))))
+
+#+end_src
 * DASHBOARD
 #+begin_src emacs-lisp
 (use-package dashboard
@@ -383,7 +409,15 @@ By default, Emacs creates automatic backups of files in their original directori
 (setq doom-modeline-buffer-state-icon t)
 (setq doom-modeline-enable-word-count nil)
 #+end_src
+* DRAG STUFF
+#+begin_src emacs-lisp
+(use-package drag-stuff
+:init
+(drag-stuff-global-mode)
+:config
+(drag-stuff-define-keys))
 
+#+end_src
 * FONTS
 ** Setting the Font Face
 #+begin_src emacs-lisp 
@@ -436,6 +470,22 @@ By default, Emacs creates automatic backups of files in their original directori
 (scroll-bar-mode -1)
 #+end_src
 
+* HIGHLIGHT TODO
+#+begin_src emacs-lisp
+(use-package hl-todo
+  :hook ((org-mode . hl-todo-mode)
+         (prog-mode . hl-todo-mode))
+  :config
+  (setq hl-todo-highlight-punctuation ":"
+        hl-todo-keyword-faces
+        `(("TODO"       warning bold)
+          ("FIXME"      error bold)
+          ("HACK"       font-lock-constant-face bold)
+          ("REVIEW"     font-lock-keyword-face bold)
+          ("NOTE"       success bold)
+          ("DEPRECATED" font-lock-doc-face bold))))
+
+#+end_src
 * HIGHLIGHT INDENT GUIDES
 #+begin_src emacs-lisp :tangle no
 (use-package highlight-indent-guides
@@ -585,7 +635,6 @@ Current Expansions include [[https://orgmode.org/manual/Structure-Templates.html
 (electric-indent-mode -1)
 (setq org-edit-src-content-indentation 0)
 #+end_src
-
 * PROJECTILE
 #+begin_src emacs-lisp
 (use-package projectile
@@ -715,7 +764,16 @@ Emacs Shell
 ;; (load-theme 'doom-nord)
 
 #+end_src
+* TOGGLING LINE-NUMBERS
+#+begin_src emacs-lisp
+(defun rgrs/toggle-line-numbering ()
+  "Toggle line numbering between absolute and relative."
+  (interactive)
+  (if (eq display-line-numbers 'relative)
+      (setq display-line-numbers t)
+    (setq display-line-numbers 'relative)))
 
+#+end_src
 * TREEMACS
 #+begin_src emacs-lisp :tangle no
 (use-package treemacs
