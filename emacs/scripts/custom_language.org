@@ -1,6 +1,13 @@
 #+TITLE: LANGUAGE SUPPORT FOR MINMACS
 #+AUTHOR: Rohit Srinivas R G
 
+* TABLE OF CONTENT :toc_2:
+- [[#bluespec-system-verilog-bsv][BLUESPEC SYSTEM VERILOG (BSV)]]
+- [[#synopsys-design-constraint-sdc][SYNOPSYS DESIGN CONSTRAINT (SDC)]]
+- [[#python][PYTHON]]
+- [[#yaml][YAML]]
+- [[#markdown-mode][MARKDOWN-MODE]]
+
 * BLUESPEC SYSTEM VERILOG (BSV)
 #+begin_src emacs-lisp
 (add-to-list 'load-path "~/.config/emacs/languages/bsv/")
@@ -21,5 +28,35 @@
 * SYNOPSYS DESIGN CONSTRAINT (SDC)
 #+begin_src emacs-lisp
 (setq auto-mode-alist (cons '("\\.sdc\\'" . tcl-mode) auto-mode-alist))
+
+#+end_src
+
+* PYTHON
+#+begin_src emacs-lisp
+(use-package anaconda-mode
+:config
+(add-hook 'python-mode-hook 'anaconda-mode))
+
+#+end_src
+
+* YAML
+#+begin_src emacs-lisp
+(use-package yaml-mode
+:config
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+(add-hook 'yaml-mode-hook
+    '(lambda ()
+    (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
+
+)
+
+
+#+end_src
+* MARKDOWN-MODE
+#+begin_src emacs-lisp
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown"))
 
 #+end_src

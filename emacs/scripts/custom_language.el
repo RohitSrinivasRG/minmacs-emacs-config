@@ -13,3 +13,21 @@
 ;;remainder theree is a bsv-indent-alist that defines the the indent variable to be used for each type of block
 
 (setq auto-mode-alist (cons '("\\.sdc\\'" . tcl-mode) auto-mode-alist))
+
+(use-package anaconda-mode
+:config
+(add-hook 'python-mode-hook 'anaconda-mode))
+
+(use-package yaml-mode
+:config
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+(add-hook 'yaml-mode-hook
+    '(lambda ()
+    (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
+
+)
+
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown"))

@@ -94,7 +94,7 @@
 
   (rgrs/leader-keys
     "b" '(:ignore t :wk "buffer")
-    "b b" '(persp-switch-to-buffer* :wk "Switch buffer")
+    "b b" '(consult-buffer :wk "Switch buffer")
     "b i" '(persp-ibuffer :wk "Ibuffer")
     "b R" '(rename-buffer :wk "rename the current buffer")
     "b k" '(persp-kill-buffer* :wk "Kill this buffer")
@@ -129,6 +129,7 @@
   "t" '(:ignore t :wk "Toggle")
   "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
   "t r" '(rgrs/toggle-line-numbering :wk "Toggle between absolute and relative line numbers")
+  "t v" '(vterm-toggle :wk "Toggle vterm")
   "t w" '(visual-line-mode :wk "word wrap"))
 
 (rgrs/leader-keys
@@ -171,6 +172,10 @@
 (rgrs/leader-keys
   "s" '(:ignore t :wk "Search")
   "s s" '(consult-line :wk "interactive search a line in the buffer")
+  "s i" '(consult-imenu :wk "interactive search a line in the buffer")
+  "s f" '(consult-projectile-find-dir :wk "interactive search a line in the buffer")
+  "s g" '(consult-grep :wk "interactive search a line in the buffer")
+  "s j" '(consult-goto-line :wk "interactive search a line in the buffer")
   "s S" '(consult-line-multi :wk "interactive search a line in multiple buffer"))
 
 (rgrs/leader-keys
@@ -193,9 +198,23 @@
   "TAB u" '(persp-unmerge :wk "Undo persp-merge")
   "TAB a" '(persp-add-buffer :wk "Add open buffer to current perspective")
   "TAB A" '(persp-set-buffer :wk "Add buffer to current but delete from all others")
+  "TAB 1" '(rgrs/persp-switch-to-1 :wk "Quick Switch to perspective 1")
+  "TAB 2" '(rgrs/persp-switch-to-2 :wk "Quick Switch to perspective 2")
+  "TAB 3" '(rgrs/persp-switch-to-3 :wk "Quick Switch to perspective 3")
+  "TAB 4" '(rgrs/persp-switch-to-4 :wk "Quick Switch to perspective 4")
+  "TAB 5" '(rgrs/persp-switch-to-5 :wk "Quick Switch to perspective 5")
+  "TAB 6" '(rgrs/persp-switch-to-6 :wk "Quick Switch to perspective 6")
+  "TAB 7" '(rgrs/persp-switch-to-7 :wk "Quick Switch to perspective 7")
+  "TAB 8" '(rgrs/persp-switch-to-8 :wk "Quick Switch to perspective 8")
+  "TAB 9" '(rgrs/persp-switch-to-9 :wk "Quick Switch to perspective 9")
+  "TAB 0" '(rgrs/persp-switch-to-0 :wk "Quick Switch to perspective 0")
   "TAB TAB" '(persp-switch-by-number :wk "switch to perspective by number"))
 
 
+(rgrs/leader-keys
+  "o" '(:ignore t :wk "Org-Mode")
+  "o e" '(rgrs/org-mode-empahsis-toggle :wk "toggle emphasis marks ")
+  "o p" '(org-tree-slide-mode :wk "Start org presentation"))
 
 
 
@@ -212,7 +231,15 @@
 (general-define-key [remap query-replace] 'anzu-query-replace)
 (general-define-key [remap query-replace-regexp] 'anzu-query-replace-regexp))
 
-(use-package consult)
+(use-package beacon
+:init
+(beacon-mode 1))
+
+(use-package consult
+:config
+(add-to-list 'consult-buffer-sources persp-consult-source))
+(use-package consult-projectile)
+(use-package consult-eglot)
 
 (use-package company
 :config
@@ -231,6 +258,16 @@
         (insert filename)
         (clipboard-kill-region (point-min) (point-max)))
       (message filename))))
+
+(use-package corral
+:config
+(global-set-key (kbd "M-9") 'corral-parentheses-backward)
+(global-set-key (kbd "M-0") 'corral-parentheses-forward)
+(global-set-key (kbd "M-[") 'corral-brackets-backward)
+(global-set-key (kbd "M-]") 'corral-brackets-forward)
+(global-set-key (kbd "M-{") 'corral-braces-backward)
+(global-set-key (kbd "M-}") 'corral-braces-forward)
+(global-set-key (kbd "M-\"") 'corral-double-quotes-backward))
 
 (use-package dashboard
   :elpaca t
@@ -282,6 +319,7 @@
     (general-evil-define-key 'normal peep-dired-mode-map (kbd "k") 'peep-dired-prev-file)
     (add-hook 'peep-dired-hook 'evil-normalize-keymaps)
 )
+(setq dired-dwim-target t)
 
 (use-package doom-modeline
   :ensure t
@@ -292,7 +330,7 @@
 (setq doom-modeline-percent-position '(-3 "%p"))
 
 ;; ;; Format used to display line numbers in the mode line. Also used to display column for some reason
-(setq doom-modeline-position-line-format '("L%l:C%c"))
+(setq doom-modeline-position-line-format '("%l:%c"))
 (setq doom-modeline-buffer-state-icon t)
 (setq doom-modeline-enable-word-count nil)
 
@@ -301,6 +339,16 @@
 (drag-stuff-global-mode)
 :config
 (drag-stuff-define-keys))
+
+(use-package eglot
+  :config
+  (add-to-list 'eglot-server-programs '(python-mode . ("pylsp")))
+
+  (setq-default eglot-workspace-configuration
+                '((:pylsp . (:configurationSources ["flake8"] :plugins (:pycodestyle (:enabled nil) :mccabe (:enabled nil) :flake8 (:enabled t))))))
+
+  :hook
+  ((python-mode . eglot-ensure)))
 
 (set-face-attribute 'default nil
   :font "JetBrains Mono"
@@ -352,6 +400,12 @@
           ("REVIEW"     font-lock-keyword-face bold)
           ("NOTE"       success bold)
           ("DEPRECATED" font-lock-doc-face bold))))
+
+(use-package highlight-indent-guides
+:ensure t
+:config
+(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+(setq highlight-indent-guides-method 'character))
 
 (add-to-list `load-path (org-babel-load-file (expand-file-name "~/.config/emacs/scripts/custom_language.org" "~/.config/emacs/scripts/")))
 
@@ -434,6 +488,23 @@
 (electric-indent-mode -1)
 (setq org-edit-src-content-indentation 0)
 
+(use-package org-tree-slide
+:config
+(setq org-image-acutal-width nil))
+
+(defun rgrs/toggle-emphasis-markers ()
+"Toggle emphasis marker in Org-Mode"
+(interactive)
+(if (eq org-hide-emphasis-markers nil)
+    (setq org-hide-emphasis-markers t)
+    (setq org-hide-emphasis-markers nil))
+)
+
+(defun rgrs/org-mode-empahsis-toggle ()
+(interactive)
+(add-hook `org-mode-hook 'rgrs/toggle-emphasis-markers)
+(revert-buffer-quick))
+
 (use-package projectile
 :config
 (projectile-mode))
@@ -443,6 +514,59 @@
   (persp-mode-prefix-key (kbd "C-c M-p"))  ; pick your own prefix key here
   :init
   (persp-mode))
+
+;; (setq persp-state-default-file "~/.config/emacs/persp-save-state")
+;; (add-hook 'kill-emacs-hook #'persp-state-save)
+
+(defun rgrs/persp-switch-to-0 ()
+"Perespective switch to view 0"
+(interactive)
+(persp-switch-by-number 0))
+
+(defun rgrs/persp-switch-to-1 ()
+"Perespective switch to view 1"
+(interactive)
+(persp-switch-by-number 1))
+
+(defun rgrs/persp-switch-to-2 ()
+"Perespective switch to view 2"
+(interactive)
+(persp-switch-by-number 2))
+
+(defun rgrs/persp-switch-to-3 ()
+"Perespective switch to view 3"
+(interactive)
+(persp-switch-by-number 3))
+
+(defun rgrs/persp-switch-to-4 ()
+"Perespective switch to view 4"
+(interactive)
+(persp-switch-by-number 4))
+
+(defun rgrs/persp-switch-to-5 ()
+"Perespective switch to view 5"
+(interactive)
+(persp-switch-by-number 5))
+
+(defun rgrs/persp-switch-to-6 ()
+"Perespective switch to view 6"
+(interactive)
+(persp-switch-by-number 6))
+
+(defun rgrs/persp-switch-to-7 ()
+"Perespective switch to view 7"
+(interactive)
+(persp-switch-by-number 7))
+
+(defun rgrs/persp-switch-to-8 ()
+"Perespective switch to view 8"
+(interactive)
+(persp-switch-by-number 8))
+
+(defun rgrs/persp-switch-to-9 ()
+"Perespective switch to view 9"
+(interactive)
+(persp-switch-by-number 9))
 
 (use-package rainbow-delimiters
 :config
