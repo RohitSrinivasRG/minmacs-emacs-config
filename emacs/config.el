@@ -235,9 +235,8 @@
 :init
 (beacon-mode 1))
 
-(use-package consult
-:config
-(add-to-list 'consult-buffer-sources persp-consult-source))
+(use-package consult)
+;; (add-to-list 'consult-buffer-sources persp-consult-source))
 (use-package consult-projectile)
 (use-package consult-eglot)
 
@@ -350,6 +349,18 @@
   :hook
   ((python-mode . eglot-ensure)))
 
+(defun rgrs/spc_4_indent ()
+ "Updates the indent tabs mode to nil"
+(interactive)
+(setq indent-tabs-mode nil))
+
+(defun rgrs/test_print ()
+ "Updates the indent tabs mode to nil"
+(interactive)
+(message "Mode loaded;LMAO bsv-mode-hook working"))
+(add-hook 'bsv-mode-hook #'rgrs/spc_4_indent)
+(add-hook 'bsv-mode-hook 'rgrs/test_print)
+
 (set-face-attribute 'default nil
   :font "JetBrains Mono"
   :height 120
@@ -405,7 +416,10 @@
 :ensure t
 :config
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-(setq highlight-indent-guides-method 'character))
+(setq highlight-indent-guides-method 'character)
+(setq highlight-indent-guides-responsive 'stack)
+
+)
 
 (add-to-list `load-path (org-babel-load-file (expand-file-name "~/.config/emacs/scripts/custom_language.org" "~/.config/emacs/scripts/")))
 
@@ -513,7 +527,9 @@
   :custom
   (persp-mode-prefix-key (kbd "C-c M-p"))  ; pick your own prefix key here
   :init
-  (persp-mode))
+  (persp-mode)
+  :config
+  (add-to-list 'consult-buffer-sources persp-consult-source))
 
 ;; (setq persp-state-default-file "~/.config/emacs/persp-save-state")
 ;; (add-hook 'kill-emacs-hook #'persp-state-save)
@@ -664,6 +680,8 @@
 (global-set-key (kbd "M-8") 'winum-select-window-8)
 
 (winner-mode 1)
+
+(use-package windresize)
 
 (use-package which-key
   :init

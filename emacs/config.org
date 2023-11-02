@@ -22,6 +22,7 @@
 - [[#doom-modeline][DOOM MODELINE]]
 - [[#drag-stuff][DRAG STUFF]]
 - [[#eglot][EGLOT]]
+- [[#formatting][FORMATTING]]
 - [[#fonts][FONTS]]
   - [[#setting-the-font-face][Setting the Font Face]]
 - [[#flycheck][FLYCHECK]]
@@ -69,6 +70,7 @@
 - [[#windowworkspace-management][WINDOW/WORKSPACE MANAGEMENT]]
   - [[#window-numbering][Window Numbering]]
   - [[#winner-mode][Winner mode]]
+  - [[#wind-resize][Wind-resize]]
 - [[#which-key][WHICH-KEY]]
 
 * IMPORTANT FILES TO LOAD FIRST
@@ -337,9 +339,8 @@ By default, Emacs creates automatic backups of files in their original directori
 #+end_src
 * CONSULT
 #+begin_src emacs-lisp
-(use-package consult
-:config
-(add-to-list 'consult-buffer-sources persp-consult-source))
+(use-package consult)
+;; (add-to-list 'consult-buffer-sources persp-consult-source))
 (use-package consult-projectile)
 (use-package consult-eglot)
 
@@ -485,6 +486,22 @@ This plugin is used to insert word wrapped paranthesis
   ((python-mode . eglot-ensure)))
 
 #+end_src
+
+* FORMATTING
+#+begin_src emacs-lisp
+(defun rgrs/spc_4_indent ()
+ "Updates the indent tabs mode to nil"
+(interactive)
+(setq indent-tabs-mode nil))
+
+(defun rgrs/test_print ()
+ "Updates the indent tabs mode to nil"
+(interactive)
+(message "Mode loaded;LMAO bsv-mode-hook working"))
+(add-hook 'bsv-mode-hook #'rgrs/spc_4_indent)
+(add-hook 'bsv-mode-hook 'rgrs/test_print)
+
+#+end_src
 * FONTS
 ** Setting the Font Face
 #+begin_src emacs-lisp 
@@ -559,7 +576,10 @@ This plugin is used to insert word wrapped paranthesis
 :ensure t
 :config
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-(setq highlight-indent-guides-method 'character))
+(setq highlight-indent-guides-method 'character)
+(setq highlight-indent-guides-responsive 'stack)
+
+)
 #+end_src
 * LANGUAGE SUPPORT
 #+begin_src emacs-lisp
@@ -745,7 +765,9 @@ _underline_
   :custom
   (persp-mode-prefix-key (kbd "C-c M-p"))  ; pick your own prefix key here
   :init
-  (persp-mode))
+  (persp-mode)
+  :config
+  (add-to-list 'consult-buffer-sources persp-consult-source))
 
 ;; (setq persp-state-default-file "~/.config/emacs/persp-save-state")
 ;; (add-hook 'kill-emacs-hook #'persp-state-save)
@@ -1073,6 +1095,11 @@ Minibuffer from the future
 ** Winner mode
 #+begin_src emacs-lisp
 (winner-mode 1)
+
+#+end_src
+** Wind-resize
+#+begin_src emacs-lisp
+(use-package windresize)
 
 #+end_src
 * WHICH-KEY
