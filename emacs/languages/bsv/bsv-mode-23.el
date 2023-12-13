@@ -5202,8 +5202,24 @@ This sets up the appropriate BSV mode environment, calls
     (statement   . ind)
     (cpp         . 0)
     (comment     . (bsv-comment-indent))
-    (unknown     . 3)
+    (unknown     . 2)
     (string      . 0)))
+
+;; (defconst bsv-indent-alist
+;;   '((block       . (+ ind bsv-indent-level))
+;;     (case        . (+ ind bsv-case-indent))
+;;     (cparenexp   . (+ ind bsv-indent-level))
+;;     (cexp        . (+ ind bsv-cexp-indent))
+;;     (defun       . (+ ind bsv-indent-level))
+;;     (declaration . (+ ind bsv-indent-level))
+;;     (directive   . (+ ind bsv-indent-level))
+;;     (tf          . (+ ind bsv-indent-level))
+;;     (behavioral  . (+ ind bsv-indent-level))
+;;     (statement   . (+ ind bsv-indent-level))
+;;     (cpp         . (+ ind bsv-indent-level))
+;;     (comment     . (+ ind bsv-indent-level))
+;;     (unknown     . (+ ind bsv-indent-level))
+;;     (string      . 0)))
 
 (defun bsv-continued-line-1 (lim)
   "Return true if this is a continued line.

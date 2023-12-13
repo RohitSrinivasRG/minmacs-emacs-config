@@ -18,6 +18,7 @@
 - [[#corral][CORRAL]]
 - [[#dashboard][DASHBOARD]]
 - [[#dired][DIRED]]
+- [[#dimmmer][DIMMMER]]
 - [[#diminish][DIMINISH]]
 - [[#doom-modeline][DOOM MODELINE]]
 - [[#drag-stuff][DRAG STUFF]]
@@ -25,6 +26,7 @@
 - [[#formatting][FORMATTING]]
 - [[#fonts][FONTS]]
   - [[#setting-the-font-face][Setting the Font Face]]
+  - [[#setting-custom-font][Setting Custom font]]
 - [[#flycheck][FLYCHECK]]
 - [[#git-program][GIT PROGRAM]]
   - [[#git-time-machine][Git Time Machine]]
@@ -62,6 +64,7 @@
   - [[#vterm-toggle][Vterm-Toggle]]
   - [[#multi-vterm][Multi-Vterm]]
 - [[#smartparens][SMARTPARENS]]
+- [[#solaire-mode][SOLAIRE-MODE]]
 - [[#sudo-edit][SUDO EDIT]]
 - [[#themes][THEMES]]
 - [[#toggling-line-numbers][TOGGLING LINE-NUMBERS]]
@@ -331,7 +334,7 @@ By default, Emacs creates automatic backups of files in their original directori
 (general-define-key [remap query-replace-regexp] 'anzu-query-replace-regexp))
 #+end_src
 * BEACON
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package beacon
 :init
 (beacon-mode 1))
@@ -342,7 +345,7 @@ By default, Emacs creates automatic backups of files in their original directori
 (use-package consult)
 ;; (add-to-list 'consult-buffer-sources persp-consult-source))
 (use-package consult-projectile)
-(use-package consult-eglot)
+;; (use-package consult-eglot)
 
 #+end_src
 
@@ -444,6 +447,14 @@ This plugin is used to insert word wrapped paranthesis
 (setq dired-dwim-target t)
 #+end_src
 
+* DIMMMER 
+#+begin_src emacs-lisp
+(use-package dimmer
+:config
+(dimmer-configure-which-key)
+(dimmer-mode t))
+
+#+end_src
 * DIMINISH
 #+begin_src emacs-lisp :tangle no
 (use-package diminish)
@@ -474,7 +485,7 @@ This plugin is used to insert word wrapped paranthesis
 
 #+end_src
 * EGLOT
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package eglot
   :config
   (add-to-list 'eglot-server-programs '(python-mode . ("pylsp")))
@@ -500,6 +511,7 @@ This plugin is used to insert word wrapped paranthesis
 (message "Mode loaded;LMAO bsv-mode-hook working"))
 (add-hook 'bsv-mode-hook #'rgrs/spc_4_indent)
 (add-hook 'bsv-mode-hook 'rgrs/test_print)
+(add-hook 'prog-hook #'rgrs/spc_4_indent)
 
 #+end_src
 * FONTS
@@ -532,6 +544,35 @@ This plugin is used to insert word wrapped paranthesis
 
 ;; Uncomment the following line if line spacing needs adjusting.
 (setq-default line-spacing 0.12)
+#+end_src
+
+** Setting Custom font
+- Does not display the icons in dashboard, because dashboards loads at the same time as this hooks running. +need to create a separte .el file to make this happen independent of nerd-icons+
+or +load dashboard after this gets loaded+ or _add these to nerd-icon package and dont wait till elpaca init hook_
+- The last option worked , moved everything to nerd-icon package
+#+begin_src emacs-lisp
+
+;; Creating a face for bluepsec blue color
+;;bluespec blue #0082f1
+(defface nerd-icons-bluespec-blue
+  '((((background dark)) :foreground "#0082f1")
+    (((background light)) :foreground "#0082f1"))
+  "Face for bluespec blue."
+  :group 'nerd-icons-faces)
+
+;; custom 
+(defcustom fontello-font-family "fontello"
+  "The Nerd Font for display icons."
+  :group 'nerd-icons
+  :type 'string)
+
+(require 'fontello  "~/.config/emacs/fonts/fontello.el")
+;; (add-hook 'elpaca-after-init-hook (lambda() (add-to-list 'nerd-icons-extension-icon-alist `("bsv"   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))))
+;; (add-hook 'elpaca-after-init-hook (lambda() (add-to-list 'nerd-icons-mode-icon-alist `(bsv-mode   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))))
+;; (add-hook 'elpaca-after-init-hook (lambda() (nerd-icons-define-icon fontello nerd-icons/fontello-alist fontello-font-family "Fontello")))
+;; (add-to-list 'nerd-icons-extension-icon-alist `("bsv"   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))
+;; (add-to-list 'nerd-icons-mode-icon-alist `(bsv-mode   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))
+;; (nerd-icons-define-icon fontello nerd-icons/fontello-alist fontello-font-family "Fontello")
 #+end_src
 
 * FLYCHECK
@@ -625,6 +666,10 @@ This plugin is used to insert word wrapped paranthesis
   ;; "Symbols Nerd Font Mono" is the default and is recommended
   ;; but you can use any other Nerd Font if you want
   ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
+:config 
+(add-to-list 'nerd-icons-extension-icon-alist `("bsv"   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))
+(add-to-list 'nerd-icons-mode-icon-alist `(bsv-mode   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))
+(nerd-icons-define-icon fontello nerd-icons/fontello-alist fontello-font-family "Fontello")
   )
 #+end_src
 
@@ -910,6 +955,14 @@ Emacs Shell
 (use-package evil-smartparens
 :config
 (add-hook 'smartparens-enabled-hook #'evil-smartparens-mode))
+
+#+end_src
+* SOLAIRE-MODE
+#+begin_src emacs-lisp
+(use-package solaire-mode
+:config
+(solaire-global-mode +1)
+)
 
 #+end_src
 * SUDO EDIT

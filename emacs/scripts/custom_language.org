@@ -18,9 +18,13 @@
 (setq auto-mode-alist (cons  '("\\.bsv\\'" . bsv-mode) auto-mode-alist))
 (setq auto-mode-alist (cons  '("\\.defines\\'" . bsv-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '("\\.defs\\'" . bsv-mode) auto-mode-alist))
-(setq bsv-indent-level-behavioral 2)
-(setq bsv-indent-level-declaration 2)
 (setq bsv-indent-level 2)
+(setq bsv-indent-level-module 2)
+(setq bsv-indent-level-declaration 2)
+(setq bsv-indent-level-directive 2)
+(setq bsv-indent-level-behavioral 2)
+(setq bsv-cexp-indent 2)
+(setq bsv-tab-always-indent nil)
 
 ;;remainder theree is a bsv-indent-alist that defines the the indent variable to be used for each type of block 
 #+end_src

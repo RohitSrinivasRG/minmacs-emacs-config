@@ -231,14 +231,10 @@
 (general-define-key [remap query-replace] 'anzu-query-replace)
 (general-define-key [remap query-replace-regexp] 'anzu-query-replace-regexp))
 
-(use-package beacon
-:init
-(beacon-mode 1))
-
 (use-package consult)
 ;; (add-to-list 'consult-buffer-sources persp-consult-source))
 (use-package consult-projectile)
-(use-package consult-eglot)
+;; (use-package consult-eglot)
 
 (use-package company
 :config
@@ -320,6 +316,11 @@
 )
 (setq dired-dwim-target t)
 
+(use-package dimmer
+:config
+(dimmer-configure-which-key)
+(dimmer-mode t))
+
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1))
@@ -339,16 +340,6 @@
 :config
 (drag-stuff-define-keys))
 
-(use-package eglot
-  :config
-  (add-to-list 'eglot-server-programs '(python-mode . ("pylsp")))
-
-  (setq-default eglot-workspace-configuration
-                '((:pylsp . (:configurationSources ["flake8"] :plugins (:pycodestyle (:enabled nil) :mccabe (:enabled nil) :flake8 (:enabled t))))))
-
-  :hook
-  ((python-mode . eglot-ensure)))
-
 (defun rgrs/spc_4_indent ()
  "Updates the indent tabs mode to nil"
 (interactive)
@@ -360,6 +351,7 @@
 (message "Mode loaded;LMAO bsv-mode-hook working"))
 (add-hook 'bsv-mode-hook #'rgrs/spc_4_indent)
 (add-hook 'bsv-mode-hook 'rgrs/test_print)
+(add-hook 'prog-hook #'rgrs/spc_4_indent)
 
 (set-face-attribute 'default nil
   :font "JetBrains Mono"
@@ -388,6 +380,28 @@
 
 ;; Uncomment the following line if line spacing needs adjusting.
 (setq-default line-spacing 0.12)
+
+;; Creating a face for bluepsec blue color
+;;bluespec blue #0082f1
+(defface nerd-icons-bluespec-blue
+  '((((background dark)) :foreground "#0082f1")
+    (((background light)) :foreground "#0082f1"))
+  "Face for bluespec blue."
+  :group 'nerd-icons-faces)
+
+;; custom 
+(defcustom fontello-font-family "fontello"
+  "The Nerd Font for display icons."
+  :group 'nerd-icons
+  :type 'string)
+
+(require 'fontello  "~/.config/emacs/fonts/fontello.el")
+;; (add-hook 'elpaca-after-init-hook (lambda() (add-to-list 'nerd-icons-extension-icon-alist `("bsv"   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))))
+;; (add-hook 'elpaca-after-init-hook (lambda() (add-to-list 'nerd-icons-mode-icon-alist `(bsv-mode   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))))
+;; (add-hook 'elpaca-after-init-hook (lambda() (nerd-icons-define-icon fontello nerd-icons/fontello-alist fontello-font-family "Fontello")))
+;; (add-to-list 'nerd-icons-extension-icon-alist `("bsv"   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))
+;; (add-to-list 'nerd-icons-mode-icon-alist `(bsv-mode   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))
+;; (nerd-icons-define-icon fontello nerd-icons/fontello-alist fontello-font-family "Fontello")
 
 (use-package flycheck
   :ensure t
@@ -455,6 +469,10 @@
   ;; "Symbols Nerd Font Mono" is the default and is recommended
   ;; but you can use any other Nerd Font if you want
   ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
+:config 
+(add-to-list 'nerd-icons-extension-icon-alist `("bsv"   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))
+(add-to-list 'nerd-icons-mode-icon-alist `(bsv-mode   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))
+(nerd-icons-define-icon fontello nerd-icons/fontello-alist fontello-font-family "Fontello")
   )
 
 (use-package nerd-icons-dired
@@ -630,6 +648,11 @@
 (use-package evil-smartparens
 :config
 (add-hook 'smartparens-enabled-hook #'evil-smartparens-mode))
+
+(use-package solaire-mode
+:config
+(solaire-global-mode +1)
+)
 
 (use-package sudo-edit
 :config
