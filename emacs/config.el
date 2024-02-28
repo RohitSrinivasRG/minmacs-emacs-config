@@ -156,11 +156,13 @@
   ;;Window Size
   "w |" '(evil-window-set-width :wk "Maximize Veritcal Window")
   "w _" '(evil-window-set-height :wk "Maximize Horizontal Window")
+  "w =" '(windresize-balance-windows :wk "Maximize Horizontal Window")
   ;; Replace with windresize package
-  "w =" '(evil-window-increase-height :wk "Increase Window Height")
-  "w -" '(evil-window-decrease-height :wk "Decrease Window Height")
-  "w >" '(evil-window-increase-width :wk "Increase Window Width")
-  "w <" '(evil-window-decrease-width :wk "Decrease Window Width"))
+  ;; "w =" '(evil-window-increase-height :wk "Increase Window Height")
+  ;; "w -" '(evil-window-decrease-height :wk "Decrease Window Height")
+  ;; "w >" '(evil-window-increase-width :wk "Increase Window Width")
+  ;; "w <" '(evil-window-decrease-width :wk "Decrease Window Width")
+)
 
 (rgrs/leader-keys
   "v" '(:ignore t :wk "Vterm")
@@ -176,7 +178,9 @@
   "s f" '(consult-projectile-find-dir :wk "interactive search a line in the buffer")
   "s g" '(consult-grep :wk "interactive search a line in the buffer")
   "s j" '(consult-goto-line :wk "interactive search a line in the buffer")
-  "s S" '(consult-line-multi :wk "interactive search a line in multiple buffer"))
+  "s S" '(consult-line-multi :wk "interactive search a line in multiple buffer")
+  "s c" '(avy-goto-char :wk "jump to character with using avy")
+  "s C" '(avy-goto-char-timer :wk "jump to character but with multiple character search option using avy"))
 
 (rgrs/leader-keys
   "g" '(:ignore t :wk "Git")
@@ -216,7 +220,17 @@
   "o e" '(rgrs/org-mode-empahsis-toggle :wk "toggle emphasis marks ")
   "o p" '(org-tree-slide-mode :wk "Start org presentation"))
 
+(rgrs/leader-keys
+  "r" '(:ignore t :wk "Org-Roam-Mode")
+  "r i" '(org-roam-node-insert :wk "roam insert node ")
+  "r g" '(org-roam-graph :wk "roam display graph")
+  "r f" '(org-roam-node-find :wk "roam find node")
+  "r c" '(org-roam-capture :wk "roam capture"))
 
+(rgrs/leader-keys
+  "SPC" '(projectile-find-file :wk "Find File in the current project"))
+
+(general-define-key "C-u" 'evil-scroll-up)
 
 )
 
@@ -224,6 +238,8 @@
 (global-set-key (kbd "C--") 'text-scale-decrease)
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+
+(use-package avy)
 
 (use-package anzu
 :config
@@ -537,6 +553,21 @@
 (add-hook `org-mode-hook 'rgrs/toggle-emphasis-markers)
 (revert-buffer-quick))
 
+(use-package org-roam
+  :ensure t
+  :custom
+  (org-roam-directory "~/RoamNotes")
+  :config
+  (org-roam-setup))
+
+  ;; :bind (("C-c n l" . org-roam-buffer-toggle)
+  ;;        ("C-c n f" . org-roam-node-find)
+  ;;        ("C-c n g" . org-roam-graph)
+  ;;        ("C-c n i" . org-roam-node-insert)
+  ;;        ("C-c n c" . org-roam-capture)
+  ;;        ;; Dailies
+  ;;        ("C-c n j" . org-roam-dailies-capture-today))
+
 (use-package projectile
 :config
 (projectile-mode))
@@ -669,7 +700,7 @@
       doom-themes-enable-italic t))
 
 (setq custom-safe-themes t)
-(add-hook 'elpaca-after-init-hook (lambda() (load-theme 'doom-nord)))
+(add-hook 'elpaca-after-init-hook (lambda() (load-theme 'doom-one)))
 ;; (load-theme 'doom-nord)
 
 (defun rgrs/toggle-line-numbering ()
@@ -692,15 +723,15 @@
 :config
 (winum-mode))
 
-(global-set-key (kbd "M-0") 'winum-select-window-0)
-(global-set-key (kbd "M-1") 'winum-select-window-1)
-(global-set-key (kbd "M-2") 'winum-select-window-2)
-(global-set-key (kbd "M-3") 'winum-select-window-3)
-(global-set-key (kbd "M-4") 'winum-select-window-4)
-(global-set-key (kbd "M-5") 'winum-select-window-5)
-(global-set-key (kbd "M-6") 'winum-select-window-6)
-(global-set-key (kbd "M-7") 'winum-select-window-7)
-(global-set-key (kbd "M-8") 'winum-select-window-8)
+(global-set-key (kbd "C-0") 'winum-select-window-0)
+(global-set-key (kbd "C-1") 'winum-select-window-1)
+(global-set-key (kbd "C-2") 'winum-select-window-2)
+(global-set-key (kbd "C-3") 'winum-select-window-3)
+(global-set-key (kbd "C-4") 'winum-select-window-4)
+(global-set-key (kbd "C-5") 'winum-select-window-5)
+(global-set-key (kbd "C-6") 'winum-select-window-6)
+(global-set-key (kbd "C-7") 'winum-select-window-7)
+(global-set-key (kbd "C-8") 'winum-select-window-8)
 
 (winner-mode 1)
 
