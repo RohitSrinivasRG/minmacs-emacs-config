@@ -95,9 +95,9 @@
   (rgrs/leader-keys
     "b" '(:ignore t :wk "buffer")
     "b b" '(consult-buffer :wk "Switch buffer")
-    "b i" '(persp-ibuffer :wk "Ibuffer")
+    "b i" '(ibuffer :wk "Ibuffer")
     "b R" '(rename-buffer :wk "rename the current buffer")
-    "b k" '(persp-kill-buffer* :wk "Kill this buffer")
+    "b k" '(tabspaces-remove-current-buffer :wk "Kill this buffer")
     "b n" '(next-buffer :wk "Next buffer")
     "b p" '(previous-buffer :wk "Previous buffer")
     "b r" '(revert-buffer-quick :wk "Reload buffer"))
@@ -113,6 +113,7 @@
 (rgrs/leader-keys
   "." '(find-file :wk "Find file")
   "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+  "f a" '((lambda () (interactive) (find-file "/home/rohit/org/Tasks.org")) :wk "Open Tasks file")
   "f y" '(put-file-name-on-clipboard :wk "Copy current working directory onto the clipboard"))
 
 (rgrs/leader-keys
@@ -149,7 +150,7 @@
   "w l" '(evil-window-right :wk "Window right")
   "w w" '(evil-window-next :wk "Goto next window")
   ;; Move Windows
-  "w H" '(windmove-swap-states-left :wk "Buffer move left")
+  "w H" '(windmove-swap-states-left :wk "Buffer move left") 
   "w J" '(windmove-swap-states-down :wk "Buffer move down")
   "w K" '(windmove-swap-states-up :wk "Buffer move up")
   "w L" '(windmove-swap-states-right :wk "Buffer move right")
@@ -191,34 +192,54 @@
 (general-define-key 
 :keymaps 'minibuffer-local-map (kbd "C-v") 'yank)
 
-(rgrs/leader-keys
-  "TAB" '(:ignore t :wk "Perspective")
-  "TAB s" '(persp-switch :wk "Create or Switch perspectives")
-  "TAB r" '(persp-rename :wk "Rename perspectives")
-  "TAB c c" '(persp-kill :wk "Kill the perspective")
-  "TAB n" '(persp-next :wk "Switch to next perspective")
-  "TAB p" '(persp-prev :wk "Switch to prev perspective")
-  "TAB m" '(persp-merge :wk "Temporarily merge two perspectives")
-  "TAB u" '(persp-unmerge :wk "Undo persp-merge")
-  "TAB a" '(persp-add-buffer :wk "Add open buffer to current perspective")
-  "TAB A" '(persp-set-buffer :wk "Add buffer to current but delete from all others")
-  "TAB 1" '(rgrs/persp-switch-to-1 :wk "Quick Switch to perspective 1")
-  "TAB 2" '(rgrs/persp-switch-to-2 :wk "Quick Switch to perspective 2")
-  "TAB 3" '(rgrs/persp-switch-to-3 :wk "Quick Switch to perspective 3")
-  "TAB 4" '(rgrs/persp-switch-to-4 :wk "Quick Switch to perspective 4")
-  "TAB 5" '(rgrs/persp-switch-to-5 :wk "Quick Switch to perspective 5")
-  "TAB 6" '(rgrs/persp-switch-to-6 :wk "Quick Switch to perspective 6")
-  "TAB 7" '(rgrs/persp-switch-to-7 :wk "Quick Switch to perspective 7")
-  "TAB 8" '(rgrs/persp-switch-to-8 :wk "Quick Switch to perspective 8")
-  "TAB 9" '(rgrs/persp-switch-to-9 :wk "Quick Switch to perspective 9")
-  "TAB 0" '(rgrs/persp-switch-to-0 :wk "Quick Switch to perspective 0")
-  "TAB TAB" '(persp-switch-by-number :wk "switch to perspective by number"))
+;; (rgrs/leader-keys
+;;   "TAB" '(:ignore t :wk "Perspective")
+;;   "TAB s" '(persp-switch :wk "Create or Switch perspectives")
+;;   "TAB r" '(persp-rename :wk "Rename perspectives")
+;;   "TAB c c" '(persp-kill :wk "Kill the perspective")
+;;   "TAB n" '(persp-next :wk "Switch to next perspective")
+;;   "TAB p" '(persp-prev :wk "Switch to prev perspective")
+;;   "TAB m" '(persp-merge :wk "Temporarily merge two perspectives")
+;;   "TAB u" '(persp-unmerge :wk "Undo persp-merge")
+;;   "TAB a" '(persp-add-buffer :wk "Add open buffer to current perspective")
+;;   "TAB A" '(persp-set-buffer :wk "Add buffer to current but delete from all others")
+;;   "TAB 1" '(rgrs/persp-switch-to-1 :wk "Quick Switch to perspective 1")
+;;   "TAB 2" '(rgrs/persp-switch-to-2 :wk "Quick Switch to perspective 2")
+;;   "TAB 3" '(rgrs/persp-switch-to-3 :wk "Quick Switch to perspective 3")
+;;   "TAB 4" '(rgrs/persp-switch-to-4 :wk "Quick Switch to perspective 4")
+;;   "TAB 5" '(rgrs/persp-switch-to-5 :wk "Quick Switch to perspective 5")
+;;   "TAB 6" '(rgrs/persp-switch-to-6 :wk "Quick Switch to perspective 6")
+;;   "TAB 7" '(rgrs/persp-switch-to-7 :wk "Quick Switch to perspective 7")
+;;   "TAB 8" '(rgrs/persp-switch-to-8 :wk "Quick Switch to perspective 8")
+;;   "TAB 9" '(rgrs/persp-switch-to-9 :wk "Quick Switch to perspective 9")
+;;   "TAB 0" '(rgrs/persp-switch-to-0 :wk "Quick Switch to perspective 0")
+;;   "TAB TAB" '(persp-switch-by-number :wk "switch to perspective by number"))
 
+(rgrs/leader-keys
+  "TAB" '(:ignore t :wk "Tabspaces")
+  "TAB s" '(tabspaces-switch-or-create-workspace :wk "Create or Switch tabspaces")
+  "TAB r" '(tab-bar-rename-tab :wk "Rename tab")
+  "TAB c c" '(tabspaces-kill-buffers-close-workspace :wk "Kill the tab workspace")
+  "TAB S" '(tabspaces-open-or-create-project-and-workspace :wk "Open a project as new tab ")
+  "TAB b" '(tabspaces-switch-buffer-and-tab :wk "Switch to Buffer present in another Tab")
+  "TAB 1" '(move-to-tab-1 :wk "Quick Switch to tab 1")
+  "TAB 2" '(move-to-tab-2 :wk "Quick Switch to tab 2")
+  "TAB 3" '(move-to-tab-3 :wk "Quick Switch to tab 3")
+  "TAB 4" '(move-to-tab-4 :wk "Quick Switch to tab 4")
+  "TAB 5" '(move-to-tab-5 :wk "Quick Switch to tab 5")
+  "TAB 6" '(move-to-tab-6 :wk "Quick Switch to tab 6")
+  "TAB 7" '(move-to-tab-7 :wk "Quick Switch to tab 7")
+  "TAB 8" '(move-to-tab-8 :wk "Quick Switch to tab 8")
+  "TAB 9" '(move-to-tab-9 :wk "Quick Switch to tab 9")
+  ;; "TAB 0" '(move-to-tab-0 :wk "Quick Switch to tab 0")
+  ;; "TAB TAB" '(persp-switch-by-number :wk "switch to perspective by number")
+)
 
 (rgrs/leader-keys
   "o" '(:ignore t :wk "Org-Mode")
   "o e" '(rgrs/org-mode-empahsis-toggle :wk "toggle emphasis marks ")
-  "o p" '(org-tree-slide-mode :wk "Start org presentation"))
+  "o p" '(org-tree-slide-mode :wk "Start org presentation
+"))
 
 (rgrs/leader-keys
   "r" '(:ignore t :wk "Org-Roam-Mode")
@@ -316,6 +337,28 @@
 (setq dashboard-icon-type 'nerd-icons)
 (setq dashboard-set-heading-icons t)
 (setq dashboard-set-file-icons t)
+
+(use-package dired
+  :elpaca nil
+  :ensure nil
+  :commands (dired dired-jump)
+  :config
+  (setq insert-directory-program "ls" dired-use-ls-dired nil)
+  (setq dired-listing-switches "-agho --group-directories-first")
+  )
+
+(use-package dired-hide-dotfiles
+  :config
+  (general-define-key :keymaps 'dired-mode-map (kbd "C-x C-.") 'dired-hide-dotfiles-mode)
+  )
+(defun my-dired-mode-hook ()
+  "My `dired' mode hook."
+  (interactive)
+  ;; To hide dot-files by default
+  (dired-hide-dotfiles-mode))
+
+;; (define-key dired-mode-map "." #'dired-hide-dotfiles-mode)
+(add-hook 'dired-mode-hook #'my-dired-mode-hook)
 
 (use-package dired-open
   :config
@@ -451,6 +494,8 @@
 
 )
 
+(use-package keycast)
+
 (add-to-list `load-path (org-babel-load-file (expand-file-name "~/.config/emacs/scripts/custom_language.org" "~/.config/emacs/scripts/")))
 
 (use-package marginalia
@@ -514,6 +559,18 @@
         completion-category-defaults nil
         completion-category-overrides '((file (styles partial-completion)))))
 
+(setq org-agenda-files 
+   '("/home/rohit/org/Tasks.org")
+)
+
+(setq org-agenda-start-with-log-mode t)
+(setq org-log-done 'time)
+(setq org-log-into-drawer t)
+
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)"))
+)
+
 (use-package toc-org
     :commands toc-org-enable
     :init (add-hook 'org-mode-hook 'toc-org-enable))
@@ -568,70 +625,15 @@
   ;;        ;; Dailies
   ;;        ("C-c n j" . org-roam-dailies-capture-today))
 
+(use-package pdf-tools
+  :config
+  (pdf-tools-install))
+
+(use-package tablist)
+
 (use-package projectile
 :config
 (projectile-mode))
-
-(use-package perspective
-  :custom
-  (persp-mode-prefix-key (kbd "C-c M-p"))  ; pick your own prefix key here
-  :init
-  (persp-mode)
-  :config
-  (add-to-list 'consult-buffer-sources persp-consult-source))
-
-;; (setq persp-state-default-file "~/.config/emacs/persp-save-state")
-;; (add-hook 'kill-emacs-hook #'persp-state-save)
-
-(defun rgrs/persp-switch-to-0 ()
-"Perespective switch to view 0"
-(interactive)
-(persp-switch-by-number 0))
-
-(defun rgrs/persp-switch-to-1 ()
-"Perespective switch to view 1"
-(interactive)
-(persp-switch-by-number 1))
-
-(defun rgrs/persp-switch-to-2 ()
-"Perespective switch to view 2"
-(interactive)
-(persp-switch-by-number 2))
-
-(defun rgrs/persp-switch-to-3 ()
-"Perespective switch to view 3"
-(interactive)
-(persp-switch-by-number 3))
-
-(defun rgrs/persp-switch-to-4 ()
-"Perespective switch to view 4"
-(interactive)
-(persp-switch-by-number 4))
-
-(defun rgrs/persp-switch-to-5 ()
-"Perespective switch to view 5"
-(interactive)
-(persp-switch-by-number 5))
-
-(defun rgrs/persp-switch-to-6 ()
-"Perespective switch to view 6"
-(interactive)
-(persp-switch-by-number 6))
-
-(defun rgrs/persp-switch-to-7 ()
-"Perespective switch to view 7"
-(interactive)
-(persp-switch-by-number 7))
-
-(defun rgrs/persp-switch-to-8 ()
-"Perespective switch to view 8"
-(interactive)
-(persp-switch-by-number 8))
-
-(defun rgrs/persp-switch-to-9 ()
-"Perespective switch to view 9"
-(interactive)
-(persp-switch-by-number 9))
 
 (use-package rainbow-delimiters
 :config
@@ -690,6 +692,95 @@
 (rgrs/leader-keys
   "f u" '(sudo-edit-find-file :wk "Sudo find file")
   "f U" '(sudo-edit :wk "Sudo edit file")))
+
+(defun move-to-tab-1 ()
+  (interactive)
+  (tab-bar-select-tab 1))
+
+(defun move-to-tab-2 ()
+  (interactive)
+  (tab-bar-select-tab 2))
+
+(defun move-to-tab-3 ()
+  (interactive)
+  (tab-bar-select-tab 3))
+
+(defun move-to-tab-4 ()
+  (interactive)
+  (tab-bar-select-tab 4))
+
+(defun move-to-tab-5 ()
+  (interactive)
+  (tab-bar-select-tab 5))
+
+(defun move-to-tab-6 ()
+  (interactive)
+  (tab-bar-select-tab 6))
+
+(defun move-to-tab-7 ()
+  (interactive)
+  (tab-bar-select-tab 7))
+
+(defun move-to-tab-8 ()
+  (interactive)
+  (tab-bar-select-tab 8))
+
+(defun move-to-tab-9 ()
+  (interactive)
+  (tab-bar-select-tab 9))
+
+(use-package tabspaces
+  :hook (after-init . tabspaces-mode) ;; use this only if you want the minor-mode loaded at startup. 
+  :commands (tabspaces-switch-or-create-workspace
+             tabspaces-open-or-create-project-and-workspace)
+  :custom
+  (tabspaces-use-filtered-buffers-as-default t)
+  (tabspaces-default-tab "Default")
+  (tabspaces-remove-to-default t)
+  (tabspaces-include-buffers '("*scratch*"))
+  (tabspaces-initialize-project-with-todo t)
+  (tabspaces-todo-file-name "project-todo.org")
+  ;; sessions
+  (tabspaces-session t)
+  (tabspaces-session-auto-restore t))
+
+(defun my--tabspace-setup ()
+ "Set up tabspace at startup."
+ ;; Add *Messages* and *splash* to Tab \`Home\'
+ (tabspaces-mode 1)
+ (progn
+   (tab-bar-rename-tab "Home")
+   (when (get-buffer "*Messages*")
+     (set-frame-parameter nil
+                          'buffer-list
+                          (cons (get-buffer "*Messages*")
+                                (frame-parameter nil 'buffer-list))))
+   (when (get-buffer "*splash*")
+     (set-frame-parameter nil
+                          'buffer-list
+                          (cons (get-buffer "*splash*")
+                                (frame-parameter nil 'buffer-list))))))
+
+(add-hook 'elpaca-after-init-hook #'my--tabspace-setup)
+;;Consult integration
+(with-eval-after-load 'consult
+;; hide full buffer list (still available with "b" prefix)
+(consult-customize consult--source-buffer :hidden t :default nil)
+;; set consult-workspace buffer list
+(defvar consult--source-workspace
+  (list :name     "Workspace Buffers"
+        :narrow   ?w
+        :history  'buffer-name-history
+        :category 'buffer
+        :state    #'consult--buffer-state
+        :default  t
+        :items    (lambda () (consult--buffer-query
+                         :predicate #'tabspaces--local-buffer-p
+                         :sort 'visibility
+                         :as #'buffer-name)))
+
+  "Set workspace buffer list for consult-buffer.")
+(add-to-list 'consult-buffer-sources 'consult--source-workspace))
 
 (add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
 
@@ -753,3 +844,5 @@
         which-key-max-description-length 25
         which-key-allow-imprecise-window-fit nil
         which-key-separator " → " ))
+
+(use-package  yasnippet)

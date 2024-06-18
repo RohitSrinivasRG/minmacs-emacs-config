@@ -10,13 +10,16 @@
   - [[#backup][Backup]]
   - [[#general-keybindings][General Keybindings]]
   - [[#zooming-in-and-out][Zooming in and out]]
+- [[#auctex][AUCTEX]]
 - [[#avy][AVY]]
+  - [[#casual-avy][Casual AVY]]
 - [[#anzu][ANZU]]
 - [[#beacon][BEACON]]
 - [[#consult][CONSULT]]
 - [[#company][COMPANY]]
 - [[#copy-file-path-to-clipboard][COPY FILE PATH TO CLIPBOARD]]
 - [[#corral][CORRAL]]
+- [[#dafny][DAFNY]]
 - [[#dashboard][DASHBOARD]]
 - [[#dired][DIRED]]
 - [[#dimmmer][DIMMMER]]
@@ -36,6 +39,7 @@
   - [[#disable-menubar-toolbars-and-scrollbars][Disable menubar, toolbars and Scrollbars]]
 - [[#highlight-todo][HIGHLIGHT TODO]]
 - [[#highlight-indent-guides][HIGHLIGHT INDENT GUIDES]]
+- [[#keycast][KEYCAST]]
 - [[#language-support][LANGUAGE SUPPORT]]
 - [[#marginalia][MARGINALIA]]
 - [[#multiple-cursors-evil][MULTIPLE-CURSORS-EVIL]]
@@ -47,6 +51,7 @@
   - [[#treemacs-configuration][Treemacs Configuration]]
 - [[#orderless][ORDERLESS]]
 - [[#org-mode][ORG MODE]]
+  - [[#agenda][Agenda]]
   - [[#enabling-table-of-contents][Enabling Table of Contents]]
   - [[#enabling-org-bullets][Enabling Org Bullets]]
   - [[#org-level-headers][Org Level Headers]]
@@ -55,6 +60,9 @@
   - [[#org-tree-slide][Org tree slide]]
   - [[#org-emaphasis-markers][Org emaphasis markers]]
   - [[#org-roam][Org-Roam]]
+- [[#pdf-tools][PDF-TOOLS]]
+  - [[#pdf-tools-1][PDF-TOOLS]]
+  - [[#tablist][TABLIST]]
 - [[#projectile][PROJECTILE]]
 - [[#perspective][PERSPECTIVE]]
 - [[#rainbow-delimiters][RAINBOW DELIMITERS]]
@@ -68,6 +76,8 @@
 - [[#smartparens][SMARTPARENS]]
 - [[#solaire-mode][SOLAIRE-MODE]]
 - [[#sudo-edit][SUDO EDIT]]
+- [[#tab-bar][TAB-BAR]]
+- [[#tabspaces][TABSPACES]]
 - [[#themes][THEMES]]
 - [[#toggling-line-numbers][TOGGLING LINE-NUMBERS]]
 - [[#treemacs][TREEMACS]]
@@ -77,6 +87,7 @@
   - [[#winner-mode][Winner mode]]
   - [[#wind-resize][Wind-resize]]
 - [[#which-key][WHICH-KEY]]
+- [[#yasnippet][YASNIPPET]]
 
 * IMPORTANT FILES TO LOAD FIRST
 ** Elpaca Package Manager
@@ -192,9 +203,9 @@ By default, Emacs creates automatic backups of files in their original directori
   (rgrs/leader-keys
     "b" '(:ignore t :wk "buffer")
     "b b" '(consult-buffer :wk "Switch buffer")
-    "b i" '(persp-ibuffer :wk "Ibuffer")
+    "b i" '(ibuffer :wk "Ibuffer")
     "b R" '(rename-buffer :wk "rename the current buffer")
-    "b k" '(persp-kill-buffer* :wk "Kill this buffer")
+    "b k" '(tabspaces-remove-current-buffer :wk "Kill this buffer")
     "b n" '(next-buffer :wk "Next buffer")
     "b p" '(previous-buffer :wk "Previous buffer")
     "b r" '(revert-buffer-quick :wk "Reload buffer"))
@@ -210,6 +221,7 @@ By default, Emacs creates automatic backups of files in their original directori
 (rgrs/leader-keys
   "." '(find-file :wk "Find file")
   "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+  "f a" '((lambda () (interactive) (find-file "/home/rohit/org/Tasks.org")) :wk "Open Tasks file")
   "f y" '(put-file-name-on-clipboard :wk "Copy current working directory onto the clipboard"))
 
 (rgrs/leader-keys
@@ -246,7 +258,7 @@ By default, Emacs creates automatic backups of files in their original directori
   "w l" '(evil-window-right :wk "Window right")
   "w w" '(evil-window-next :wk "Goto next window")
   ;; Move Windows
-  "w H" '(windmove-swap-states-left :wk "Buffer move left")
+  "w H" '(windmove-swap-states-left :wk "Buffer move left") 
   "w J" '(windmove-swap-states-down :wk "Buffer move down")
   "w K" '(windmove-swap-states-up :wk "Buffer move up")
   "w L" '(windmove-swap-states-right :wk "Buffer move right")
@@ -288,34 +300,54 @@ By default, Emacs creates automatic backups of files in their original directori
 (general-define-key 
 :keymaps 'minibuffer-local-map (kbd "C-v") 'yank)
 
-(rgrs/leader-keys
-  "TAB" '(:ignore t :wk "Perspective")
-  "TAB s" '(persp-switch :wk "Create or Switch perspectives")
-  "TAB r" '(persp-rename :wk "Rename perspectives")
-  "TAB c c" '(persp-kill :wk "Kill the perspective")
-  "TAB n" '(persp-next :wk "Switch to next perspective")
-  "TAB p" '(persp-prev :wk "Switch to prev perspective")
-  "TAB m" '(persp-merge :wk "Temporarily merge two perspectives")
-  "TAB u" '(persp-unmerge :wk "Undo persp-merge")
-  "TAB a" '(persp-add-buffer :wk "Add open buffer to current perspective")
-  "TAB A" '(persp-set-buffer :wk "Add buffer to current but delete from all others")
-  "TAB 1" '(rgrs/persp-switch-to-1 :wk "Quick Switch to perspective 1")
-  "TAB 2" '(rgrs/persp-switch-to-2 :wk "Quick Switch to perspective 2")
-  "TAB 3" '(rgrs/persp-switch-to-3 :wk "Quick Switch to perspective 3")
-  "TAB 4" '(rgrs/persp-switch-to-4 :wk "Quick Switch to perspective 4")
-  "TAB 5" '(rgrs/persp-switch-to-5 :wk "Quick Switch to perspective 5")
-  "TAB 6" '(rgrs/persp-switch-to-6 :wk "Quick Switch to perspective 6")
-  "TAB 7" '(rgrs/persp-switch-to-7 :wk "Quick Switch to perspective 7")
-  "TAB 8" '(rgrs/persp-switch-to-8 :wk "Quick Switch to perspective 8")
-  "TAB 9" '(rgrs/persp-switch-to-9 :wk "Quick Switch to perspective 9")
-  "TAB 0" '(rgrs/persp-switch-to-0 :wk "Quick Switch to perspective 0")
-  "TAB TAB" '(persp-switch-by-number :wk "switch to perspective by number"))
+;; (rgrs/leader-keys
+;;   "TAB" '(:ignore t :wk "Perspective")
+;;   "TAB s" '(persp-switch :wk "Create or Switch perspectives")
+;;   "TAB r" '(persp-rename :wk "Rename perspectives")
+;;   "TAB c c" '(persp-kill :wk "Kill the perspective")
+;;   "TAB n" '(persp-next :wk "Switch to next perspective")
+;;   "TAB p" '(persp-prev :wk "Switch to prev perspective")
+;;   "TAB m" '(persp-merge :wk "Temporarily merge two perspectives")
+;;   "TAB u" '(persp-unmerge :wk "Undo persp-merge")
+;;   "TAB a" '(persp-add-buffer :wk "Add open buffer to current perspective")
+;;   "TAB A" '(persp-set-buffer :wk "Add buffer to current but delete from all others")
+;;   "TAB 1" '(rgrs/persp-switch-to-1 :wk "Quick Switch to perspective 1")
+;;   "TAB 2" '(rgrs/persp-switch-to-2 :wk "Quick Switch to perspective 2")
+;;   "TAB 3" '(rgrs/persp-switch-to-3 :wk "Quick Switch to perspective 3")
+;;   "TAB 4" '(rgrs/persp-switch-to-4 :wk "Quick Switch to perspective 4")
+;;   "TAB 5" '(rgrs/persp-switch-to-5 :wk "Quick Switch to perspective 5")
+;;   "TAB 6" '(rgrs/persp-switch-to-6 :wk "Quick Switch to perspective 6")
+;;   "TAB 7" '(rgrs/persp-switch-to-7 :wk "Quick Switch to perspective 7")
+;;   "TAB 8" '(rgrs/persp-switch-to-8 :wk "Quick Switch to perspective 8")
+;;   "TAB 9" '(rgrs/persp-switch-to-9 :wk "Quick Switch to perspective 9")
+;;   "TAB 0" '(rgrs/persp-switch-to-0 :wk "Quick Switch to perspective 0")
+;;   "TAB TAB" '(persp-switch-by-number :wk "switch to perspective by number"))
 
+(rgrs/leader-keys
+  "TAB" '(:ignore t :wk "Tabspaces")
+  "TAB s" '(tabspaces-switch-or-create-workspace :wk "Create or Switch tabspaces")
+  "TAB r" '(tab-bar-rename-tab :wk "Rename tab")
+  "TAB c c" '(tabspaces-kill-buffers-close-workspace :wk "Kill the tab workspace")
+  "TAB S" '(tabspaces-open-or-create-project-and-workspace :wk "Open a project as new tab ")
+  "TAB b" '(tabspaces-switch-buffer-and-tab :wk "Switch to Buffer present in another Tab")
+  "TAB 1" '(move-to-tab-1 :wk "Quick Switch to tab 1")
+  "TAB 2" '(move-to-tab-2 :wk "Quick Switch to tab 2")
+  "TAB 3" '(move-to-tab-3 :wk "Quick Switch to tab 3")
+  "TAB 4" '(move-to-tab-4 :wk "Quick Switch to tab 4")
+  "TAB 5" '(move-to-tab-5 :wk "Quick Switch to tab 5")
+  "TAB 6" '(move-to-tab-6 :wk "Quick Switch to tab 6")
+  "TAB 7" '(move-to-tab-7 :wk "Quick Switch to tab 7")
+  "TAB 8" '(move-to-tab-8 :wk "Quick Switch to tab 8")
+  "TAB 9" '(move-to-tab-9 :wk "Quick Switch to tab 9")
+  ;; "TAB 0" '(move-to-tab-0 :wk "Quick Switch to tab 0")
+  ;; "TAB TAB" '(persp-switch-by-number :wk "switch to perspective by number")
+)
 
 (rgrs/leader-keys
   "o" '(:ignore t :wk "Org-Mode")
   "o e" '(rgrs/org-mode-empahsis-toggle :wk "toggle emphasis marks ")
-  "o p" '(org-tree-slide-mode :wk "Start org presentation"))
+  "o p" '(org-tree-slide-mode :wk "Start org presentation
+"))
 
 (rgrs/leader-keys
   "r" '(:ignore t :wk "Org-Roam-Mode")
@@ -340,10 +372,28 @@ By default, Emacs creates automatic backups of files in their original directori
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 #+end_src
+* AUCTEX
+#+begin_src emacs-lisp :tangle no
+(use-package auctex
+  :ensure t
+  :defer t
+  :config
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t))
+
+#+end_src
 * AVY
 #+begin_src emacs-lisp
 (use-package avy)
 #+end_src
+
+** Casual AVY
+#+begin_src emacs-lisp :tangle no
+(use-package casual-avy
+  :ensure t
+  :bind ("SPC-s-m" . casual-avy-tmenu))
+#+end_src
+
 
 * ANZU
 #+begin_src emacs-lisp
@@ -410,6 +460,14 @@ This plugin is used to insert word wrapped paranthesis
 
 
 #+end_src
+
+* DAFNY
+#+begin_src emacs-lisp :tangle no
+(use-package boogie-friends
+:config
+(setq flycheck-dafny-executable "/home/rohit/packages/dafny-4.6.0-x64-ubuntu-20.04/dafny/dafny")
+)
+#+end_src
 * DASHBOARD
 #+begin_src emacs-lisp
 (use-package dashboard
@@ -451,20 +509,42 @@ This plugin is used to insert word wrapped paranthesis
 #+end_src
 * DIRED
 #+begin_src emacs-lisp
-(use-package dired-open
-  :config
-  (setq dired-open-extensions '(("vcd" . "gtkwave")
-				  ("fst" . "gtkwave"))))
-(use-package peep-dired
-  :after dired
-  :config
-    (general-evil-define-key 'normal dired-mode-map (kbd "h") 'dired-up-directory)
-    (general-evil-define-key 'normal dired-mode-map (kbd "l") 'dired-open-file) ; use dired-find-file instead if not using dired-open package
-    (general-evil-define-key 'normal peep-dired-mode-map (kbd "j") 'peep-dired-next-file)
-    (general-evil-define-key 'normal peep-dired-mode-map (kbd "k") 'peep-dired-prev-file)
-    (add-hook 'peep-dired-hook 'evil-normalize-keymaps)
-)
-(setq dired-dwim-target t)
+      (use-package dired
+	:elpaca nil
+	:ensure nil
+	:commands (dired dired-jump)
+	:config
+	(setq insert-directory-program "ls" dired-use-ls-dired nil)
+	(setq dired-listing-switches "-agho --group-directories-first")
+	)
+
+      (use-package dired-hide-dotfiles
+	:config
+	(general-define-key :keymaps 'dired-mode-map (kbd "C-x C-.") 'dired-hide-dotfiles-mode)
+	)
+      (defun my-dired-mode-hook ()
+	"My `dired' mode hook."
+	(interactive)
+	;; To hide dot-files by default
+	(dired-hide-dotfiles-mode))
+
+      ;; (define-key dired-mode-map "." #'dired-hide-dotfiles-mode)
+      (add-hook 'dired-mode-hook #'my-dired-mode-hook)
+
+      (use-package dired-open
+	:config
+	(setq dired-open-extensions '(("vcd" . "gtkwave")
+					("fst" . "gtkwave"))))
+      (use-package peep-dired
+	:after dired
+	:config
+	  (general-evil-define-key 'normal dired-mode-map (kbd "h") 'dired-up-directory)
+	  (general-evil-define-key 'normal dired-mode-map (kbd "l") 'dired-open-file) ; use dired-find-file instead if not using dired-open package
+	  (general-evil-define-key 'normal peep-dired-mode-map (kbd "j") 'peep-dired-next-file)
+	  (general-evil-define-key 'normal peep-dired-mode-map (kbd "k") 'peep-dired-prev-file)
+	  (add-hook 'peep-dired-hook 'evil-normalize-keymaps)
+      )
+      (setq dired-dwim-target t)
 #+end_src
 
 * DIMMMER 
@@ -642,6 +722,10 @@ or +load dashboard after this gets loaded+ or _add these to nerd-icon package an
 
 )
 #+end_src
+* KEYCAST
+#+begin_src emacs-lisp
+(use-package keycast)
+#+end_src
 * LANGUAGE SUPPORT
 #+begin_src emacs-lisp
 (add-to-list `load-path (org-babel-load-file (expand-file-name "~/.config/emacs/scripts/custom_language.org" "~/.config/emacs/scripts/")))
@@ -656,7 +740,7 @@ or +load dashboard after this gets loaded+ or _add these to nerd-icon package an
 
 #+end_src
 * MULTIPLE-CURSORS-EVIL
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp 
 (use-package evil-multiedit
 :config
 (evil-multiedit-default-keybinds)
@@ -735,6 +819,21 @@ or +load dashboard after this gets loaded+ or _add these to nerd-icon package an
         completion-category-overrides '((file (styles partial-completion)))))
 #+end_src
 * ORG MODE
+** Agenda
+#+begin_src emacs-lisp
+(setq org-agenda-files 
+   '("/home/rohit/org/Tasks.org")
+)
+
+(setq org-agenda-start-with-log-mode t)
+(setq org-log-done 'time)
+(setq org-log-into-drawer t)
+
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)"))
+)
+
+#+end_src
 ** Enabling Table of Contents
 #+begin_src emacs-lisp
 (use-package toc-org
@@ -750,7 +849,7 @@ or +load dashboard after this gets loaded+ or _add these to nerd-icon package an
 #+end_src
 
 ** Org Level Headers
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp
   (custom-set-faces
   '(org-level-1 ((t (:inherit outline-1 :height 1.7))))
   '(org-level-2 ((t (:inherit outline-2 :height 1.6))))
@@ -837,7 +936,19 @@ Note taking
   ;;        ("C-c n j" . org-roam-dailies-capture-today))
 
 #+end_src
+* PDF-TOOLS
+** PDF-TOOLS
+#+begin_src emacs-lisp
+(use-package pdf-tools
+  :config
+  (pdf-tools-install))
 
+#+end_src
+** TABLIST
+#+begin_src emacs-lisp
+(use-package tablist)
+
+#+end_src
 * PROJECTILE
 #+begin_src emacs-lisp
 (use-package projectile
@@ -846,7 +957,7 @@ Note taking
 
 #+end_src
 * PERSPECTIVE 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package perspective
   :custom
   (persp-mode-prefix-key (kbd "C-c M-p"))  ; pick your own prefix key here
@@ -1014,7 +1125,100 @@ Emacs Shell
   "f u" '(sudo-edit-find-file :wk "Sudo find file")
   "f U" '(sudo-edit :wk "Sudo edit file")))
 #+end_src
+* TAB-BAR
+#+begin_src emacs-lisp
+(defun move-to-tab-1 ()
+  (interactive)
+  (tab-bar-select-tab 1))
 
+(defun move-to-tab-2 ()
+  (interactive)
+  (tab-bar-select-tab 2))
+
+(defun move-to-tab-3 ()
+  (interactive)
+  (tab-bar-select-tab 3))
+
+(defun move-to-tab-4 ()
+  (interactive)
+  (tab-bar-select-tab 4))
+
+(defun move-to-tab-5 ()
+  (interactive)
+  (tab-bar-select-tab 5))
+
+(defun move-to-tab-6 ()
+  (interactive)
+  (tab-bar-select-tab 6))
+
+(defun move-to-tab-7 ()
+  (interactive)
+  (tab-bar-select-tab 7))
+
+(defun move-to-tab-8 ()
+  (interactive)
+  (tab-bar-select-tab 8))
+
+(defun move-to-tab-9 ()
+  (interactive)
+  (tab-bar-select-tab 9))
+#+end_src
+* TABSPACES
+#+begin_src emacs-lisp
+(use-package tabspaces
+  :hook (after-init . tabspaces-mode) ;; use this only if you want the minor-mode loaded at startup. 
+  :commands (tabspaces-switch-or-create-workspace
+             tabspaces-open-or-create-project-and-workspace)
+  :custom
+  (tabspaces-use-filtered-buffers-as-default t)
+  (tabspaces-default-tab "Default")
+  (tabspaces-remove-to-default t)
+  (tabspaces-include-buffers '("*scratch*"))
+  (tabspaces-initialize-project-with-todo t)
+  (tabspaces-todo-file-name "project-todo.org")
+  ;; sessions
+  (tabspaces-session t)
+  (tabspaces-session-auto-restore t))
+
+(defun my--tabspace-setup ()
+ "Set up tabspace at startup."
+ ;; Add *Messages* and *splash* to Tab \`Home\'
+ (tabspaces-mode 1)
+ (progn
+   (tab-bar-rename-tab "Home")
+   (when (get-buffer "*Messages*")
+     (set-frame-parameter nil
+                          'buffer-list
+                          (cons (get-buffer "*Messages*")
+                                (frame-parameter nil 'buffer-list))))
+   (when (get-buffer "*splash*")
+     (set-frame-parameter nil
+                          'buffer-list
+                          (cons (get-buffer "*splash*")
+                                (frame-parameter nil 'buffer-list))))))
+
+(add-hook 'elpaca-after-init-hook #'my--tabspace-setup)
+;;Consult integration
+(with-eval-after-load 'consult
+;; hide full buffer list (still available with "b" prefix)
+(consult-customize consult--source-buffer :hidden t :default nil)
+;; set consult-workspace buffer list
+(defvar consult--source-workspace
+  (list :name     "Workspace Buffers"
+        :narrow   ?w
+        :history  'buffer-name-history
+        :category 'buffer
+        :state    #'consult--buffer-state
+        :default  t
+        :items    (lambda () (consult--buffer-query
+                         :predicate #'tabspaces--local-buffer-p
+                         :sort 'visibility
+                         :as #'buffer-name)))
+
+  "Set workspace buffer list for consult-buffer.")
+(add-to-list 'consult-buffer-sources 'consult--source-workspace))
+
+#+end_src
 * THEMES
 #+begin_src emacs-lisp
 (add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
@@ -1216,4 +1420,10 @@ Minibuffer from the future
           which-key-separator " → " ))
 
 #+End_src
+
+* YASNIPPET
+#+begin_src emacs-lisp
+(use-package  yasnippet)
+
+#+end_src
 
