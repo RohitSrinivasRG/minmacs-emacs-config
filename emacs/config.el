@@ -1,39 +1,41 @@
-(defvar elpaca-installer-version 0.5)
-  (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
-  (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-  (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
-  (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-				:ref nil
-				:files (:defaults (:exclude "extensions"))
-				:build (:not elpaca--activate-package)))
-  (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
-	 (build (expand-file-name "elpaca/" elpaca-builds-directory))
-	 (order (cdr elpaca-order))
-	 (default-directory repo))
-    (add-to-list 'load-path (if (file-exists-p build) build repo))
-    (unless (file-exists-p repo)
-      (make-directory repo t)
-      (when (< emacs-major-version 28) (require 'subr-x))
-      (condition-case-unless-debug err
-	  (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-		   ((zerop (call-process "git" nil buffer t "clone"
-					 (plist-get order :repo) repo)))
-		   ((zerop (call-process "git" nil buffer t "checkout"
-					 (or (plist-get order :ref) "--"))))
-		   (emacs (concat invocation-directory invocation-name))
-		   ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-					 "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-		   ((require 'elpaca))
-		   ((elpaca-generate-autoloads "elpaca" repo)))
-	      (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-	    (error "%s" (with-current-buffer buffer (buffer-string))))
-	((error) (warn "%s" err) (delete-directory repo 'recursive))))
-    (unless (require 'elpaca-autoloads nil t)
-      (require 'elpaca)
-      (elpaca-generate-autoloads "elpaca" repo)
-      (load "./elpaca-autoloads")))
-  (add-hook 'after-init-hook #'elpaca-process-queues)
-  (elpaca `(,@elpaca-order))
+(defvar elpaca-installer-version 0.7)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil :depth 1
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (< emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                 ,@(when-let ((depth (plist-get order :depth)))
+                                                     (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                 ,(plist-get order :repo) ,repo))))
+                 ((zerop (call-process "git" nil buffer t "checkout"
+                                       (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (load "./elpaca-autoloads")))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
 
 ;; Install use-package support
 (elpaca elpaca-use-package
@@ -249,7 +251,7 @@
   "r c" '(org-roam-capture :wk "roam capture"))
 
 (rgrs/leader-keys
-  "SPC" '(projectile-find-file :wk "Find File in the current project"))
+  "SPC" '(consult-projectile-find-file :wk "Find File in the current project"))
 
 (general-define-key "C-u" 'evil-scroll-up)
 
@@ -268,16 +270,87 @@
 (general-define-key [remap query-replace] 'anzu-query-replace)
 (general-define-key [remap query-replace-regexp] 'anzu-query-replace-regexp))
 
-(use-package consult)
-;; (add-to-list 'consult-buffer-sources persp-consult-source))
-(use-package consult-projectile)
-;; (use-package consult-eglot)
+(use-package casual-calc
+  :ensure t
+  :bind (:map calc-mode-map ("C-o" . #'casual-calc-tmenu)))
 
-(use-package company
-:config
-(setq company-idle-delay (lambda () (if (company-in-string-or-comment) nil 0.2))))
+(use-package corfu
+  ;; Optional customizations
+  :custom
+  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  (corfu-auto t)                 ;; Enable auto completion
+  (corfu-separator ?_)          ;; Orderless field separator
+  (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
 
-(add-hook 'elpaca-after-init-hook 'global-company-mode)
+  ;; Enable Corfu only for certain modes.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+
+  ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
+  ;; be used globally (M-/).  See also the customization variable
+  ;; `global-corfu-modes' to exclude certain modes.
+  ;; :init
+  ;; (global-corfu-mode)
+  )
+
+(add-hook 'elpaca-after-init-hook 'global-corfu-mode)
+;; Enable Corfu completion UI
+;; See the Corfu README for more configuration tips.
+;; Add extensions
+
+(use-package cape
+  ;; Bind dedicated completion commands
+  ;; Alternative prefix keys: C-c p, M-p, M-+, ...
+  :bind (("C-c p p" . completion-at-point) ;; capf
+         ("C-c p t" . complete-tag)        ;; etags
+         ("C-c p d" . cape-dabbrev)        ;; or dabbrev-completion
+         ("C-c p h" . cape-history)
+         ("C-c p f" . cape-file)
+         ("C-c p k" . cape-keyword)
+         ("C-c p s" . cape-elisp-symbol)
+         ("C-c p e" . cape-elisp-block)
+         ("C-c p a" . cape-abbrev)
+         ("C-c p l" . cape-line)
+         ("C-c p w" . cape-dict)
+         ("C-c p :" . cape-emoji)
+         ("C-c p \\" . cape-tex)
+         ("C-c p _" . cape-tex)
+         ("C-c p ^" . cape-tex)
+         ("C-c p &" . cape-sgml)
+         ("C-c p r" . cape-rfc1345))
+  :init
+  ;; Add to the global default value of `completion-at-point-functions' which is
+  ;; used by `completion-at-point'.  The order of the functions matters, the
+  ;; first function returning a result wins.  Note that the list of buffer-local
+  ;; completion functions takes precedence over the global list.
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  ;;(add-hook 'completion-at-point-functions #'cape-history)
+  ;;(add-hook 'completion-at-point-functions #'cape-keyword)
+  ;;(add-hook 'completion-at-point-functions #'cape-tex)
+  ;;(add-hook 'completion-at-point-functions #'cape-sgml)
+  ;;(add-hook 'completion-at-point-functions #'cape-rfc1345)
+  ;;(add-hook 'completion-at-point-functions #'cape-abbrev)
+  ;;(add-hook 'completion-at-point-functions #'cape-dict)
+  ;;(add-hook 'completion-at-point-functions #'cape-elisp-symbol)
+  ;;(add-hook 'completion-at-point-functions #'cape-line)
+)
+
+;; (use-package kind-icon
+;;   :ensure t
+;;   :after corfu
+;;   ;:custom
+;;   ; (kind-icon-blend-background t)
+;;   ; (kind-icon-default-face 'corfu-default) ; only needed with blend-background
+;;   :config
+;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (defun put-file-name-on-clipboard ()
   "Put the current file name on the clipboard"
@@ -302,7 +375,6 @@
 (global-set-key (kbd "M-\"") 'corral-double-quotes-backward))
 
 (use-package dashboard
-  :elpaca t
   :config
   (add-hook 'elpaca-after-init-hook #'dashboard-insert-startupify-lists)
   (add-hook 'elpaca-after-init-hook #'dashboard-initialize)
@@ -339,7 +411,6 @@
 (setq dashboard-set-file-icons t)
 
 (use-package dired
-  :elpaca nil
   :ensure nil
   :commands (dired dired-jump)
   :config
@@ -362,8 +433,8 @@
 
 (use-package dired-open
   :config
-  (setq dired-open-extensions '(("vcd" . "gtkwave")
-				  ("fst" . "gtkwave"))))
+  (setq dired-open-extensions '(("vcd" . "surfer")
+				  ("fst" . "surfer"))))
 (use-package peep-dired
   :after dired
   :config
@@ -398,6 +469,9 @@
 (drag-stuff-global-mode)
 :config
 (drag-stuff-define-keys))
+
+;; yes-or-no behaviour to y-or-n behaviour
+(setopt use-short-answers t)
 
 (defun rgrs/spc_4_indent ()
  "Updates the indent tabs mode to nil"
@@ -466,7 +540,27 @@
   :ensure t
   :init (global-flycheck-mode))
 
-(use-package magit)
+;; (use-package magit
+;;   :ensure t)
+
+;; ########################################################################################
+;; FIX FOR MAGIT ASKING FOR SEQ VERSION GREATER THAN THE ONE SHIPPED WITH EMACS29.1
+(defun +elpaca-unload-seq (e)
+  (and (featurep 'seq) (unload-feature 'seq t))
+  (elpaca--continue-build e))
+
+;; You could embed this code directly in the reicpe, I just abstracted it into a function.
+(defun +elpaca-seq-build-steps ()
+  (append (butlast (if (file-exists-p (expand-file-name "seq" elpaca-builds-directory))
+                       elpaca--pre-built-steps elpaca-build-steps))
+          (list '+elpaca-unload-seq 'elpaca--activate-package)))
+
+(elpaca `(seq :build ,(+elpaca-seq-build-steps)))
+
+(use-package magit 
+  :after (seq transient)
+  :ensure t)
+;;###########################################################################################
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -503,6 +597,75 @@
 ("M-A" . marginalia-cycle))
 :init
 (marginalia-mode))
+
+;; (use-package consult
+;;   ;; :ensure t
+;;   ;; :config
+;;   ;; (with-eval-after-load 'consult
+;;   ;;   (add-to-list 'consult-imenu-config 
+;;   ;;                '(bsv-mode 
+;;   ;;                  :toplevel "Modules"
+;;   ;;                  :types 
+;;   ;;                  ((?m "Modules" font-lock-function-name-face)
+;;   ;;                   (?r "Rules" font-lock-function-name-face)
+;;   ;;                   )
+;;   ;;                  )
+;;   ;;                )
+;;   ;;   )
+;;   )
+(use-package consult
+  :ensure t
+  :config
+  ;; Ensure consult-imenu is loaded
+  (require 'consult-imenu)
+
+  ;; Add to consult-imenu-config
+  (when (boundp 'consult-imenu-config)
+    (add-to-list 'consult-imenu-config
+                 '(bsv-mode
+                   :toplevel "Modules"
+                   :types ((?m "Modules" font-lock-function-name-face)
+                           (?r "Rules" font-lock-function-name-face))))))
+(use-package consult-projectile)
+;; (use-package consult-eglot)
+
+(use-package embark
+  :ensure t
+
+  :bind
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+  :init
+
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  ;; Show the Embark target at point via Eldoc. You may adjust the
+  ;; Eldoc strategy, if you want to see the documentation from
+  ;; multiple providers. Beware that using this can be a little
+  ;; jarring since the message shown in the minibuffer can be more
+  ;; than one line, causing the modeline to move up and down:
+
+  ;; (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
+  ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
+
+  :config
+
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+;; Consult users will also want the embark-consult package.
+(use-package embark-consult
+  :ensure t ; only need to install it, embark loads it after consult if found
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
+
+(use-package wgrep)
 
 (use-package evil-multiedit
 :config
@@ -580,13 +743,13 @@
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
 (custom-set-faces
-'(org-level-1 ((t (:inherit outline-1 :height 1.7))))
-'(org-level-2 ((t (:inherit outline-2 :height 1.6))))
-'(org-level-3 ((t (:inherit outline-3 :height 1.5))))
-'(org-level-4 ((t (:inherit outline-4 :height 1.4))))
-'(org-level-5 ((t (:inherit outline-5 :height 1.3))))
-'(org-level-6 ((t (:inherit outline-5 :height 1.2))))
-'(org-level-7 ((t (:inherit outline-5 :height 1.1)))))
+'(org-level-1 ((t (:inherit outline-1 :height 1.35))))
+'(org-level-2 ((t (:inherit outline-2 :height 1.3))))
+'(org-level-3 ((t (:inherit outline-3 :height 1.25))))
+'(org-level-4 ((t (:inherit outline-4 :height 1.2))))
+'(org-level-5 ((t (:inherit outline-5 :height 1.15))))
+'(org-level-6 ((t (:inherit outline-5 :height 1.10))))
+'(org-level-7 ((t (:inherit outline-5 :height 1.10)))))
 
 (require 'org-tempo)
 
@@ -800,6 +963,8 @@
   (if (eq display-line-numbers 'relative)
       (setq display-line-numbers t)
     (setq display-line-numbers 'relative)))
+
+(use-package transient)
 
 (use-package vertico
   :init

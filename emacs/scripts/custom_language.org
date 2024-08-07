@@ -10,23 +10,33 @@
 
 * BLUESPEC SYSTEM VERILOG (BSV)
 #+begin_src emacs-lisp
-(add-to-list 'load-path "~/.config/emacs/languages/bsv/")
-(add-to-list 'load-path "~/.config/emacs/languages/bsv/emacs20-extras.el")
-(add-to-list 'load-path "~/.config/emacs/languages/bsv/mark.el")
+  (add-to-list 'load-path "~/.config/emacs/languages/bsv/")
+  (add-to-list 'load-path "~/.config/emacs/languages/bsv/emacs20-extras.el")
+  (add-to-list 'load-path "~/.config/emacs/languages/bsv/mark.el")
 
-(autoload 'bsv-mode "bsv-mode" "BSV mode" t )
-(setq auto-mode-alist (cons  '("\\.bsv\\'" . bsv-mode) auto-mode-alist))
-(setq auto-mode-alist (cons  '("\\.defines\\'" . bsv-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '("\\.defs\\'" . bsv-mode) auto-mode-alist))
-(setq bsv-indent-level 2)
-(setq bsv-indent-level-module 2)
-(setq bsv-indent-level-declaration 2)
-(setq bsv-indent-level-directive 2)
-(setq bsv-indent-level-behavioral 2)
-(setq bsv-cexp-indent 2)
-(setq bsv-tab-always-indent nil)
+  (autoload 'bsv-mode "bsv-mode" "BSV mode" t )
+  (setq auto-mode-alist (cons  '("\\.bsv\\'" . bsv-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons  '("\\.defines\\'" . bsv-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.defs\\'" . bsv-mode) auto-mode-alist))
+  (setq bsv-indent-level 2)
+  (setq bsv-indent-level-module 2)
+  (setq bsv-indent-level-declaration 2)
+  (setq bsv-indent-level-directive 2)
+  (setq bsv-indent-level-behavioral 2)
+  (setq bsv-cexp-indent 2)
+  (setq bsv-tab-always-indent nil)
 
-;;remainder theree is a bsv-indent-alist that defines the the indent variable to be used for each type of block 
+  ;; (add-to-list 'consult-imenu-config 
+  ;; 	       '(bsv-mode 
+  ;; 		 :toplevel "Modules"
+  ;; 		 :types 
+  ;; 		 ((?m "Modules" font-lock-function-name-face)
+  ;; 		  (?r "Rules" font-lock-function-name-face)		  
+  ;; 		  )
+  ;; 		 )
+  ;; )
+
+  ;;remainder theree is a bsv-indent-alist that defines the the indent variable to be used for each type of block 
 #+end_src
 
 * SYNOPSYS DESIGN CONSTRAINT (SDC)

@@ -14,6 +14,16 @@
 (setq bsv-cexp-indent 2)
 (setq bsv-tab-always-indent nil)
 
+;; (add-to-list 'consult-imenu-config 
+;; 	       '(bsv-mode 
+;; 		 :toplevel "Modules"
+;; 		 :types 
+;; 		 ((?m "Modules" font-lock-function-name-face)
+;; 		  (?r "Rules" font-lock-function-name-face)		  
+;; 		  )
+;; 		 )
+;; )
+
 ;;remainder theree is a bsv-indent-alist that defines the the indent variable to be used for each type of block
 
 (setq auto-mode-alist (cons '("\\.sdc\\'" . tcl-mode) auto-mode-alist))

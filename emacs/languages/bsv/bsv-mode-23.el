@@ -1181,8 +1181,11 @@ For example, \"_t$\" matches typedefs named with _t, as in the C language."
   :type 'hook)
 
 (defvar bsv-imenu-generic-expression
-  '((nil "^\\s-*\\(\\(m\\(odule\\|acromodule\\)\\)\\|primitive\\)\\s-+\\([a-zA-Z0-9_.:]+\\)" 4)
-    ("*Vars*" "^\\s-*\\(reg\\|wire\\)\\s-+\\(\\|\\[[^]]+\\]\\s-+\\)\\([A-Za-z0-9_]+\\)" 3))
+  '((#1="Modules" "^\\s-*\\(\\(m\\(odule\\|acromodule\\)\\)\\|primitive\\)\\s-+\\([a-zA-Z0-9_.:]+\\)" 4)
+    ;; ("Vars" "^\\s-*\\(reg\\|wire\\)\\s-+\\(\\|\\[[^]]+\\]\\s-+\\)\\([A-Za-z0-9_]+\\)" 3)
+    ;; ("Vars" "^\s+*\\(Reg\#\\|Wire\#\\|MIMO\#\\|FIFO\#\\)\s+*\\(\(\\([A-ZA-Z0-9_.:#(,)]*\)\\)\\)\s*\\([A-ZA-Z0-9_.:]+\\)" 6)
+    ("Rules" "^\\s-*rule\\s-+\\([A-Za-z0-9_:.]+\\)" 1)
+    )
   "Imenu expression for BSV mode.  See `imenu-generic-expression'.")
 
 ;;
@@ -3676,6 +3679,7 @@ Key bindings specific to `bsv-mode-map' are:
   ;; Tell imenu how to handle BSV.
   (set (make-local-variable 'imenu-generic-expression)
        bsv-imenu-generic-expression)
+  (setq imenu-create-index-function 'imenu-default-create-index-function)
   ;; Tell which-func-modes that imenu knows about bsv
   ;; (when (boundp 'which-func-modes)
   ;;   (add-to-list 'which-func-modes 'bsv-mode))
