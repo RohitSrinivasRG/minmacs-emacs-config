@@ -488,15 +488,15 @@
 
 (set-face-attribute 'default nil
   :font "JetBrains Mono"
-  :height 120
+  :height 110
   :weight 'medium)
 (set-face-attribute 'variable-pitch nil
   :font "Ubuntu"
-  :height 130
+  :height 120
   :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
   :font "JetBrains Mono"
-  :height 120
+  :height 110
   :weight 'medium)
 ;; Makes commented text and keywords italics.
 ;; This is working in emacsclient but not emacs.
@@ -578,15 +578,6 @@
           ("REVIEW"     font-lock-keyword-face bold)
           ("NOTE"       success bold)
           ("DEPRECATED" font-lock-doc-face bold))))
-
-(use-package highlight-indent-guides
-:ensure t
-:config
-(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-(setq highlight-indent-guides-method 'character)
-(setq highlight-indent-guides-responsive 'stack)
-
-)
 
 (use-package keycast)
 
@@ -954,7 +945,7 @@
       doom-themes-enable-italic t))
 
 (setq custom-safe-themes t)
-(add-hook 'elpaca-after-init-hook (lambda() (load-theme 'doom-one)))
+(add-hook 'elpaca-after-init-hook (lambda() (load-theme 'doom-gruvbox)))
 ;; (load-theme 'doom-nord)
 
 (defun rgrs/toggle-line-numbering ()
@@ -1011,3 +1002,19 @@
         which-key-separator " → " ))
 
 (use-package  yasnippet)
+
+(use-package kbd-mode 
+  :ensure (:host github :repo "kmonad/kbd-mode")
+)
+
+(use-package diff-hl
+  :config
+  (diff-hl-margin-mode)
+  (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+  )
+
+(use-package indent-bars
+  :ensure (:host github :repo "jdtsmith/indent-bars")
+  :hook ((prog-mode) . indent-bars-mode)
+  )

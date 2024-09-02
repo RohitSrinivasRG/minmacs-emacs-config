@@ -98,6 +98,9 @@
   - [[#wind-resize][Wind-resize]]
 - [[#which-key][WHICH-KEY]]
 - [[#yasnippet][YASNIPPET]]
+- [[#languages][LANGUAGES]]
+- [[#diff-hl][DIFF-HL]]
+- [[#indent-bars][INDENT-BARS]]
 
 * IMPORTANT FILES TO LOAD FIRST
 ** Elpaca Package Manager
@@ -716,15 +719,15 @@ This plugin is used to insert word wrapped paranthesis
 #+begin_src emacs-lisp 
   (set-face-attribute 'default nil
   :font "JetBrains Mono"
-  :height 120
+  :height 110
   :weight 'medium)
 (set-face-attribute 'variable-pitch nil
   :font "Ubuntu"
-  :height 130
+  :height 120
   :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
   :font "JetBrains Mono"
-  :height 120
+  :height 110
   :weight 'medium)
 ;; Makes commented text and keywords italics.
 ;; This is working in emacsclient but not emacs.
@@ -829,7 +832,7 @@ or +load dashboard after this gets loaded+ or _add these to nerd-icon package an
 
 #+end_src
 * HIGHLIGHT INDENT GUIDES
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package highlight-indent-guides
 :ensure t
 :config
@@ -1427,7 +1430,7 @@ Emacs Shell
       doom-themes-enable-italic t))
 
 (setq custom-safe-themes t)
-(add-hook 'elpaca-after-init-hook (lambda() (load-theme 'doom-one)))
+(add-hook 'elpaca-after-init-hook (lambda() (load-theme 'doom-gruvbox)))
 ;; (load-theme 'doom-nord)
 
 #+end_src
@@ -1629,3 +1632,30 @@ Minibuffer from the future
 
 #+end_src
 
+* LANGUAGES
+#+begin_src emacs-lisp
+(use-package kbd-mode 
+  :ensure (:host github :repo "kmonad/kbd-mode")
+)
+
+#+end_src
+
+* DIFF-HL 
+#+begin_src emacs-lisp
+(use-package diff-hl
+  :config
+  (diff-hl-margin-mode)
+  (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+  )
+
+#+end_src
+
+* INDENT-BARS
+#+begin_src emacs-lisp
+(use-package indent-bars
+  :ensure (:host github :repo "jdtsmith/indent-bars")
+  :hook ((prog-mode) . indent-bars-mode)
+  )
+
+#+end_src
