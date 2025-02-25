@@ -98,6 +98,37 @@
 (electric-indent-mode -1)
 (setq org-edit-src-content-indentation 0)
 
+(use-package org-roam
+  :ensure t
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory "~/RoamNotes")
+  (org-roam-completion-everywhere t)
+  (org-roam-capture-templates
+   '(
+     ("d" "default" plain
+      "%?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
+      :unnarrowed t)
+     )
+   )
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)
+         :map org-mode-map
+         ("C-M-i" . completion-at-point))
+  :config
+  (org-roam-setup))
+
+(use-package avy
+  :config
+  (general-define-key "M-s c" `avy-goto-char)
+  (general-define-key "M-s C" `avy-goto-char-2)
+  (avy-setup-default)
+  (global-set-key (kbd "C-c C-j") 'avy-resume)
+   )
+
 (use-package dired
   :ensure nil
   :commands (dired dired-jump)
@@ -321,7 +352,26 @@
 
   )
 
-(use-package nerd-icons)
+(defface nerd-icons-bluespec-blue
+  '((((background dark)) :foreground "#0082f1")
+    (((background light)) :foreground "#0082f1"))
+  "Face for bluespec blue."
+  :group 'nerd-icons-faces)
+
+;; custom 
+(defcustom fontello-font-family "fontello"
+  "The Nerd Font for display icons."
+  :group 'nerd-icons
+  :type 'string)
+
+(require 'fontello  "~/.config/emacs/fonts/fontello.el")
+
+(use-package nerd-icons
+  :config
+  (add-to-list 'nerd-icons-extension-icon-alist `("bsv"   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))
+  (add-to-list 'nerd-icons-mode-icon-alist `(bsv-mode   nerd-icons-fontello "nf-bluespec"    :face nerd-icons-bluespec-blue))
+  (nerd-icons-define-icon fontello nerd-icons/fontello-alist fontello-font-family "Fontello")
+  )
 
 (use-package nerd-icons-dired
   :hook
@@ -353,11 +403,6 @@
 ;; Remember to add an entry for `t', the library uses that as default.
 
 ;; The Custom interface is also supported for tuning the variable above.
-
-(use-package dimmer
-:config
-(dimmer-configure-which-key)
-(dimmer-mode t))
 
 (winner-mode 1)
 
@@ -473,7 +518,10 @@
 (use-package consult-project-extra
   :bind
   (("C-c p f" . consult-project-extra-find)
-   ("C-c p o" . consult-project-extra-find-other-window)))
+   ("C-c p o" . consult-project-extra-find-other-window)
+   ;; ("C-x b" . consult-project-buffer)
+   )
+  )
 
 (use-package drag-stuff
   :config
@@ -614,6 +662,139 @@
   (setq auth-sources '("~/.authinfo"))
 )
 
+(use-package hs-minor-mode
+  :ensure nil
+  :hook prog-mode
+  :bind
+  (("C-c f" . hs-toggle-hiding)
+   ("C-c l" . hs-hide-level)
+   ("C-c U" . hs-show-all)
+   )
+  )
+
+(use-package dired-hacks-utils)
+
+(use-package dired-filter)
+
+;; (use-package dired-avfs)
+
+(use-package dired-open
+  :config
+  (setq dired-open-extensions '(("vcd" . "surfer")
+				("fst" . "surfer"))))
+
+
+(use-package dired-rainbow
+  :config
+  (progn
+    (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
+    (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
+    (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
+    (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
+    (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
+    (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
+    (dired-rainbow-define media "#de751f" ("mp3" "mp4" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
+    (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
+    (dired-rainbow-define log "#c17d11" ("log"))
+    (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
+    (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
+    (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java" "bsv"))
+    (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
+    (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
+    (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
+    (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
+    (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
+    (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
+    (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
+    (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*")
+    ))
+
+(use-package dired-subtree
+  :config
+  (define-key dired-mode-map (kbd "i") `dired-subtree-toggle)
+  )
+
+(use-package dired-ranger)
+
+(use-package dired-narrow)
+
+(use-package dired-list)
+
+(use-package dired-collapse)
+
+(use-package git-timemachine)
+
+(defun switch-to-minibuffer ()
+  "Switch to minibuffer window."
+  (interactive)
+  (if (active-minibuffer-window)
+      (select-window (active-minibuffer-window))
+    (error "Minibuffer is not active")))
+
+(global-set-key (kbd "C-`") #'switch-to-minibuffer) 
+
+(defun prot-simple-keyboard-quit-dwim ()
+  "Do-What-I-Mean behaviour for a general `keyboard-quit'.
+
+The generic `keyboard-quit' does not do the expected thing when
+the minibuffer is open.  Whereas we want it to close the
+minibuffer, even without explicitly focusing it.
+
+The DWIM behaviour of this command is as follows:
+
+- When the region is active, disable it.
+- When a minibuffer is open, but not focused, close the minibuffer.
+- When the Completions buffer is selected, close it.
+- In every other case use the regular `keyboard-quit'."
+  (interactive)
+  (cond
+   ((region-active-p)
+    (keyboard-quit))
+   ((derived-mode-p 'completion-list-mode)
+    (delete-completion-window))
+   ((> (minibuffer-depth) 0)
+    (abort-recursive-edit))
+   (t
+    (keyboard-quit))))
+
+(global-set-key (kbd "C-g") #'prot-simple-keyboard-quit-dwim)
+
+(global-set-key (kbd "C-c C-<left>") 'windmove-swap-states-left )
+(global-set-key (kbd "C-c C-<right>") 'windmove-swap-states-right )
+(global-set-key (kbd "C-c C-<up>") 'windmove-swap-states-up )
+(global-set-key (kbd "C-c C-<down>") 'windmove-swap-states-down )
+
+(use-package impatient-mode)
+
+(use-package buffer-terminator
+  :ensure t
+  :custom
+  (buffer-terminator-verbose nil)
+  :config
+  (buffer-terminator-mode 1))
+
+(use-package yasnippet
+  :config
+  (yas-global-mode 1)
+  )
+
+(use-package yasnippet-snippets)
+
+(use-package consult-yasnippet
+  :config
+  (general-define-key "C-c i s" `consult-yasnippet)
+)
+
+(use-package dired-rsync
+  :bind (:map dired-mode-map
+              ("C-c C-r" . dired-rsync)))
+(use-package dired-rsync-transient
+  :bind (:map dired-mode-map
+              ("C-c C-x" . dired-rsync-transient)))
+
+
+(add-to-list 'global-mode-string '("" dired-rsync-modeline-status))
+
 (use-package kbd-mode 
   :ensure (:host github :repo "kmonad/kbd-mode")
   ;;(kbd-mode-kill-kmonad "pkill -9 kmonad")
@@ -670,3 +851,5 @@
 (add-hook 'bsv-mode-hook #'rgrs/spc_4_indent)
 (add-hook 'bsv-mode-hook 'rgrs/test_print)
 (add-hook 'prog-hook #'rgrs/spc_4_indent)
+
+(use-package dockerfile-mode)
