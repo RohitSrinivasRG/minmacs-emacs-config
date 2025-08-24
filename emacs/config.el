@@ -52,6 +52,47 @@
 (scroll-bar-mode -1)
 (set-language-environment "UTF-8")
 
+;; smart beginning-of-line (BOL)
+(defadvice move-beginning-of-line (around smarter-bol activate)
+  ;; Move to requested line if needed.
+  (let ((arg (or (ad-get-arg 0) 1)))
+    (when (/= arg 1)
+      (forward-line (1- arg))))
+  ;; Move to indentation on first call, then to actual BOL on second.
+  (let ((pos (point)))
+    (back-to-indentation)
+    (when (= pos (point))
+      ad-do-it)))
+
+
+(defun toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+         (next-win-buffer (window-buffer (next-window)))
+         (this-win-edges (window-edges (selected-window)))
+         (next-win-edges (window-edges (next-window)))
+         (this-win-2nd (not (and (<= (car this-win-edges)
+                     (car next-win-edges))
+                     (<= (cadr this-win-edges)
+                     (cadr next-win-edges)))))
+         (splitter
+          (if (= (car this-win-edges)
+             (car (window-edges (next-window))))
+          'split-window-horizontally
+        'split-window-vertically)))
+    (delete-other-windows)
+    (let ((first-win (selected-window)))
+      (funcall splitter)
+      (if this-win-2nd (other-window 1))
+      (set-window-buffer (selected-window) this-win-buffer)
+      (set-window-buffer (next-window) next-win-buffer)
+      (select-window first-win)
+      (if this-win-2nd (other-window 1))))))
+
+
+(global-set-key (kbd "C-x |") 'toggle-window-split)
+
 (use-package general
   :config
   (general-create-definer rgrs-leader-keys
@@ -72,6 +113,7 @@
   ;;   )
   (general-define-key
     "<f7>" `display-line-numbers-mode)
+  (general-define-key "<f5>" `revert-buffer-quick)
      
   )
 
@@ -127,7 +169,10 @@
   (general-define-key "M-s C" `avy-goto-char-2)
   (avy-setup-default)
   (global-set-key (kbd "C-c C-j") 'avy-resume)
-   )
+  (global-set-key (kbd "M-j") `avy-goto-char-timer)
+  (general-define-key "M-s s" `avy-copy-line)
+  (general-define-key "M-s S" `avy-copy-region)
+  )
 
 (use-package dired
   :ensure nil
@@ -314,6 +359,18 @@
 )
 (use-package transient)
 
+(defun magit-add-current-buffer-to-kill-ring ()
+  "Show the current branch in the echo-area and add it to the `kill-ring'."
+  (interactive)
+  (let ((branch (magit-get-current-branch)))
+    (if branch
+        (progn (kill-new branch)
+               (message "%s" branch))
+      (user-error "There is not current branch"))))
+
+(with-eval-after-load 'magit
+  (define-key magit-mode-map (kbd "M-w") #'magit-add-current-buffer-to-kill-ring))
+
 (use-package anzu
 :config
 (global-anzu-mode 1)
@@ -329,7 +386,7 @@
       doom-themes-enable-italic t))
 
 (setq custom-safe-themes t)
-(add-hook 'elpaca-after-init-hook (lambda() (load-theme 'doom-gruvbox)))
+(add-hook 'elpaca-after-init-hook (lambda() (load-theme 'doom-opera)))
 
 (use-package doom-modeline
   :ensure t
@@ -439,20 +496,32 @@
                    :toplevel "Modules"
                    :types ((?m "Modules" font-lock-function-name-face)
                            (?r "Rules" font-lock-function-name-face)))))
+  (consult-customize
+   consult-line
+   :add-history (seq-some #'thing-at-point '(region symbol)))
+  
+  (defalias 'consult-line-thing-at-point 'consult-line)
+  
+  (consult-customize
+   consult-line-thing-at-point
+   :initial (thing-at-point 'symbol))
 :bind (
        ("C-x b" . consult-buffer)
        ("M-g i" . consult-imenu)
        ("C-x r b" . consult-bookmark)
        ("M-s l" . consult-line)
+       ("M-s L" . consult-line-thing-at-point)
        ("M-s g" . consult-grep)
        ("M-s r" . consult-ripgrep)
        ("M-g g" . consult-goto-line) 
        ("M-g M-g" . consult-goto-line)
        ("C-x p b" . consult-project-buffer)
+       ("M-y"     . consult-yank-from-kill-ring)
        ;; M-s bindings in `search-map'
        ("M-s d" . consult-find) 
        ("M-s k" . consult-keep-lines)
        ("M-s u" . consult-focus-lines)
+       ("M-g m" . consult-mark)
        )
 )
 
@@ -691,7 +760,7 @@
     (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
     (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
     (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
-    (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
+    (dired-rainbow-define markdown "#ffad4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
     (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
     (dired-rainbow-define media "#de751f" ("mp3" "mp4" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
     (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
@@ -702,7 +771,7 @@
     (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
     (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
     (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
-    (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
+    (dired-rainbow-define encrypted "#ff0d4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
     (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
     (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
     (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
@@ -714,7 +783,14 @@
   (define-key dired-mode-map (kbd "i") `dired-subtree-toggle)
   )
 
-(use-package dired-ranger)
+(use-package dired-ranger
+  :bind 
+  (:map dired-mode-map
+	("C-c c" . dired-ranger-copy)
+	("C-c y" . dired-ranger-paste)
+	("C-c r" . dired-ranger-move)
+   ))
+
 
 (use-package dired-narrow)
 
@@ -785,15 +861,41 @@ The DWIM behaviour of this command is as follows:
   (general-define-key "C-c i s" `consult-yasnippet)
 )
 
-(use-package dired-rsync
-  :bind (:map dired-mode-map
-              ("C-c C-r" . dired-rsync)))
-(use-package dired-rsync-transient
-  :bind (:map dired-mode-map
-              ("C-c C-x" . dired-rsync-transient)))
+(use-package async
+  :custom
+  (autoload 'dired-async-mode "dired-async.el" nil t)
+  (dired-async-mode 1)
+  )
 
+(use-package casual-avy
+  :bind 
+  (
+   ("M-s t" . casual-avy-tmenu)
+   )
+  )
 
-(add-to-list 'global-mode-string '("" dired-rsync-modeline-status))
+(use-package org-journal)
+
+(use-package ediff
+  :ensure nil
+  :init
+  (setq ediff-split-window-function 'split-window-horizontally
+        ediff-window-setup-function 'ediff-setup-windows-plain)
+)
+
+(use-package workgroups2
+  :config
+  (setq wg-prefix-key "C-c z")
+  (setq wg-session-file "~/.config/emacs/.emacs_workgroups")
+  (workgroups-mode 1)
+  :bind
+  (
+   ("C-x C-a c" . wg-create-workgroup)
+   ("C-x C-a o" . wg-open-workgroup)
+   ("C-x C-a k" . wg-kill-workgroup)
+   ("C-x C-a s" . wg-switch-to-workgroup)
+   )
+  )
 
 (use-package kbd-mode 
   :ensure (:host github :repo "kmonad/kbd-mode")
@@ -818,6 +920,30 @@ The DWIM behaviour of this command is as follows:
 (setq bsv-tab-always-indent nil)
 
 ;;TODO: ADD ICON for BLUESPEC
+(defun bsv-append-method-name-to-endmethod ()
+  "Improved version with exact method name capture"
+  (when (and (eq major-mode 'bsv-mode)
+             (save-excursion
+               (beginning-of-line)
+               (looking-at "^\\s-*endmethod\\s-*$")))
+    (let ((method-name nil))
+      (save-excursion
+        (when (re-search-backward 
+               "^\\s-*method\\s-+\\(?:\\S-+\\s-+\\)?\\([^ \t\n(]+\\)\\s-*(" 
+               nil t)
+          (setq method-name (match-string 1))))
+      (when method-name
+        (end-of-line)
+        (unless (looking-back (concat ":\\s-*" method-name "\\s-*") (line-beginning-position))
+          (insert (concat ": " method-name)))))))
+
+
+(defun bsv-endmethod-advice (orig-fun &rest args)
+  "Same advice wrapper as before"
+  (apply orig-fun args)
+  (bsv-append-method-name-to-endmethod))
+
+(advice-add 'bsv-complete-or-indent-command :around #'bsv-endmethod-advice)
 
 (setq auto-mode-alist (cons '("\\.sdc\\'" . tcl-mode) auto-mode-alist))
 
